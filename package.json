@@ -20,6 +20,7 @@
   "author": "Decahedron Technologies Ltd. <hello@decahedron.io>",
   "license": "MIT",
   "devDependencies": {
+    "@types/jasmine": "^2.5.52",
     "jasmine": "^2.6.0",
     "typescript": "^2.0"
   }

@@ -1,3 +1,5 @@
 node_modules
 dist
 *.js
+.idea
+npm-debug.log
