@@ -1,5 +1,7 @@
-namespace Decahedron {
-    export namespace Entity {
+        import {EntityBuilder} from './EntityBuilder';
+        import {defaultMetadataStorage} from './support/storage';
+        import {TypeMetadata} from './support/metadata/TypeMetadata';
+        import {StringHelper} from './support/StringHelper';
         export class Entity {
 
             /**
@@ -29,7 +31,7 @@ namespace Decahedron {
                         // in which case the entity itself should be assumed
                         // responsible to construct the array of entities.
                         if (value instanceof Array && value.length > 0 && typeof value[0] === 'object') {
-                            const metadata = defaultMetadataStorage.findTypeMetadata(sourceObject.constructor, key);
+                            const metadata: TypeMetadata = defaultMetadataStorage.findTypeMetadata(sourceObject.constructor, key);
 
                             if (metadata) {
                                 sourceObject[metadata.propertyName] = EntityBuilder.buildMany(metadata.type, value);
@@ -52,6 +54,4 @@ namespace Decahedron {
             fromJson(jsonData: any): any {
                 return Entity.jsonParse(this, jsonData);
             }
-        }
-    }
 }
