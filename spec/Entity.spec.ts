@@ -14,6 +14,11 @@ class Address extends Entity {
     public country: string = null;
 }
 
+class Post extends Entity {
+    public title: string = null;
+    public content: string = null;
+}
+
 class UserWithAddress extends User {
     public address: Address = null;
 }
@@ -21,6 +26,16 @@ class UserWithAddress extends User {
 class UserWithAnnotatedAddress extends User {
     @Type(Address)
     public address: Address;
+}
+
+class UserWithAnnotatedPosts extends User {
+    @Type(Post)
+    public posts?: Post[];
+}
+
+class UserWithAliasedPrimitive extends User {
+    @Type(String, 'second_name')
+    public middleName: string;
 }
 
 describe('Entity', () => {
@@ -76,5 +91,51 @@ describe('Entity', () => {
         expect(user.address.city).toEqual('London');
         expect(user.address.zip).toEqual('N1 7GU');
         expect(user.address.country).toEqual('United Kingdom');
+    });
+
+    it('decodes an annotated optional nested array object', () => {
+        const user = new UserWithAnnotatedPosts();
+
+        user.fromJson({
+            name: 'Decahedron Technologies Ltd.',
+            email: 'hello@decahedron.io',
+            days_available: ['Monday', 'Wednesday', 'Friday'],
+            posts: [{
+                title: 'About',
+                content: 'Lorem ipsum dolor sit amet'
+            }]
+        });
+
+        expect(user.posts).toBeDefined();
+        expect(user.posts[0]).toBeDefined();
+        expect(user.posts[0].title).toEqual('About');
+        expect(user.posts[0].content).toEqual('Lorem ipsum dolor sit amet');
+    });
+
+    it('decodes an annotated optional nested array object to empty array', () => {
+        const user = new UserWithAnnotatedPosts();
+
+        user.fromJson({
+            name: 'Decahedron Technologies Ltd.',
+            email: 'hello@decahedron.io',
+            days_available: ['Monday', 'Wednesday', 'Friday'],
+            posts: []
+        });
+
+        expect(user.posts).toBeDefined();
+        expect(user.posts).toEqual([]);
+    });
+
+    it('interprets an annotated primitive as an alias', () => {
+        const user = new UserWithAliasedPrimitive();
+
+        user.fromJson({
+            name: 'Decahedron Technologies Ltd',
+            email: 'hello@decahedron.io',
+            days_available: ['Monday', 'Wednesday', 'Friday'],
+            second_name: 'A Middle Name'
+        })
+
+        expect (user.middleName).toEqual('A Middle Name');
     });
 })
