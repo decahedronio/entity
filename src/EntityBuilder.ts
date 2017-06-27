@@ -6,8 +6,12 @@ export class EntityBuilder {
      * @param sourceData
      * @returns {any}
      */
-    public static buildOne<T>(buildClass: any, sourceData: Object): T {
+    public static buildOne<T>(buildClass: any, sourceData: Object): T|any {
         this.checkClassValidity(buildClass);
+
+        if (buildClass === Object) {
+            return sourceData;
+        }
 
         const entity: any = new buildClass();
         entity.fromJson(sourceData);

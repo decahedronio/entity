@@ -38,6 +38,11 @@ class UserWithAliasedPrimitive extends User {
     public middleName: string;
 }
 
+class UserWithAnnotatedObject extends User {
+    @Type(Object)
+    public address: Object;
+}
+
 describe('Entity', () => {
     it('can decode a json payload into an entity', () => {
         const user = new User;
@@ -134,8 +139,30 @@ describe('Entity', () => {
             email: 'hello@decahedron.io',
             days_available: ['Monday', 'Wednesday', 'Friday'],
             second_name: 'A Middle Name'
+        });
+
+        expect(user.middleName).toEqual('A Middle Name');
+    });
+
+    it('can decode an annotated Object, without being an entity', () => {
+        const user = new UserWithAnnotatedObject();
+
+        user.fromJson({
+            name: 'Decahedron Technologies Ltd',
+            email: 'hello@decahedron.io',
+            days_available: ['Monday', 'Wednesday', 'Friday'],
+            address: {
+                street: '20-22 Wenlock Road',
+                city: 'London',
+                zip: 'N1 7GU',
+                country: 'United Kingdom'
+            }
         })
 
-        expect (user.middleName).toEqual('A Middle Name');
+        expect(user.address).toBeDefined();
+        expect(user.address['street']).toEqual('20-22 Wenlock Road');
+        expect(user.address['city']).toEqual('London');
+        expect(user.address['zip']).toEqual('N1 7GU');
+        expect(user.address['country']).toEqual('United Kingdom');
     });
 })

@@ -94,8 +94,7 @@ public homeAddress: Address = null;
 will assume that the json holds the key `home_address`. If that is not the case, it should be manually specified as the second argument to `@Type`.
 
 ### Note about `Object`
-If your entity has a nested object that is **not** represented by another entity, you should override `fromJson`, as `@Type` currently only works for other entities.
+If your entity has a nested object that is **not** represented by another entity, you can also use `@Type(Object)` to annotate that the object should simply be stored as is.
 
 ## To-do
 - [ ] Create an `IEntity` interface that can be implemented
-- [ ] Add tests
