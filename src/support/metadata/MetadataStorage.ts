@@ -29,8 +29,13 @@ export class MetadataStorage {
      * @returns {TypeMetadata}
      */
     findTypeMetadata(target: any, propertyName: string): TypeMetadata {
-        const metadataFromTarget = this.typeMetadatas.find(meta => meta.target === target && meta.sourcePropertyName === propertyName);
-        const metadataFromChildren = this.typeMetadatas.find(meta => target.prototype instanceof meta.target && meta.sourcePropertyName === propertyName);
+        const metadataFromTarget = this.typeMetadatas.find(meta => 
+            meta.target === target && meta.sourcePropertyName === propertyName
+        );
+
+        const metadataFromChildren = this.typeMetadatas.find(meta => 
+            target.prototype instanceof meta.target && meta.sourcePropertyName === propertyName
+        );
 
         return metadataFromTarget || metadataFromChildren;
     }
