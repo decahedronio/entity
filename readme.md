@@ -25,7 +25,7 @@ class User extends Entity {
 
 fetch('https://api.service.com/v1/users/1')
     .then(response => response.Body.json())
-    .then(jsonData => Decahedron.Entity.EntityBuilder.buildOne<User>(User, jsonData));
+    .then(jsonData => EntityBuilder.buildOne<User>(User, jsonData));
 ```
 
 You can also build an array of entities:
@@ -33,7 +33,7 @@ You can also build an array of entities:
 ```typescript
 fetch('https://api.service.com/v1/users')
     .then(response => response.Body.json())
-    .then(jsonData => Decahedron.Entity.EntityBuilder.buildMany<User>(User, jsonData));
+    .then(jsonData => EntityBuilder.buildMany<User>(User, jsonData));
 ```
 
 ### Annotating nested entities
