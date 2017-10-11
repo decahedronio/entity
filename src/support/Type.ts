@@ -1,6 +1,6 @@
-import {defaultMetadataStorage} from './storage';
-import {StringHelper} from './StringHelper';
-import {TypeMetadata} from './metadata/TypeMetadata';
+import { defaultMetadataStorage } from './storage';
+import { StringHelper } from './StringHelper';
+import { TypeMetadata } from './metadata/TypeMetadata';
 
 export function Type(type?: Function, jsonKey?: string) {
     return function (target: any, key: string) {

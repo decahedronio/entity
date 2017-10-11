@@ -2,13 +2,14 @@
   "name": "@decahedron/entity",
   "version": "2.2.0",
   "description": "A library to encode and decode JSON into entity classes",
-  "main": "index.js",
+  "main": "dist/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "tsc",
+    "test": "jasmine"
   },
   "repository": {
     "type": "git",
-    "url": "git@git.github.com:decahedronio/entity"
+    "url": "https://github.com/decahedronio/entity"
   },
   "keywords": [
     "entity",

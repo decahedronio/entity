@@ -8,15 +8,10 @@
     "experimentalDecorators": true,
     "declaration": true,
     "outDir": "./dist",
+    "rootDir": "./",
     "removeComments": true,
     "noUnusedLocals": true,
-    "lib": ["es2015", "dom"]
-  },
-  "include": [
-    "src/**/*.ts",
-    "spec/**/*.ts"
-  ],
-  "exclude": [
-    "node_modules"
-  ]
+    "lib": ["es2015", "dom"],
+    "baseUrl": "./"
+  }
 }

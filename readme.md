@@ -14,6 +14,8 @@ yarn add @decahedron/entity
 The basic usage is very straightforward: make your class extend `Entity`, and use the `EntityBuilder` to hydrate instances of it:
 
 ```typescript
+import { Entity, EntityBuilder } from '@decahedron/entity';
+
 class User extends Entity {
 	// We instantiate with null to ensure the property exists
 	// at the time of hydration.
@@ -23,7 +25,7 @@ class User extends Entity {
 
 fetch('https://api.service.com/v1/users/1')
     .then(response => response.Body.json())
-    .then(jsonData => Decahedron.Entity.EntityBuilder.buildOne<User>(User, jsonData));
+    .then(jsonData => EntityBuilder.buildOne<User>(User, jsonData));
 ```
 
 You can also build an array of entities:
@@ -31,7 +33,7 @@ You can also build an array of entities:
 ```typescript
 fetch('https://api.service.com/v1/users')
     .then(response => response.Body.json())
-    .then(jsonData => Decahedron.Entity.EntityBuilder.buildMany<User>(User, jsonData));
+    .then(jsonData => EntityBuilder.buildMany<User>(User, jsonData));
 ```
 
 ### Annotating nested entities
@@ -53,6 +55,8 @@ The JSON decoding process will _ignore_ the nested object (`address`). This also
 
 There are two ways to solve this. The first one is to simply override the `fromJson` method (in fact, this is why we expose the method on the `Entity`, to make it easy to override decoding functionality):
 ```typescript
+import { Entity, EntityBuilder } from '@decahedron/entity';
+
 class User extends Entity {
     public name: string = null;
     public email: string = null;
@@ -98,3 +102,12 @@ If your entity has a nested object that is **not** represented by another entity
 
 ## To-do
 - [ ] Create an `IEntity` interface that can be implemented
+
+## Contributing
+
+Run the build and the tests using the following commands:
+
+```
+$ npm run build
+$ npm test
+```
