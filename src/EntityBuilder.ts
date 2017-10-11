@@ -6,7 +6,7 @@ export class EntityBuilder {
      * @param sourceData
      * @returns {any}
      */
-    public static buildOne<T>(buildClass: any, sourceData: Object): T|any {
+    public static buildOne<T>(buildClass: any, sourceData: Object): T | any {
         this.checkClassValidity(buildClass);
 
         if (buildClass === Object) {
