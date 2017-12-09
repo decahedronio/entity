@@ -17,8 +17,8 @@ The basic usage is very straightforward: make your class extend `Entity`, and us
 import { Entity, EntityBuilder } from '@decahedron/entity';
 
 class User extends Entity {
-	// We instantiate with null to ensure the property exists
-	// at the time of hydration.
+    // We instantiate with null to ensure the property exists
+    // at the time of hydration.
     public name: string = null;
     public email: string = null;
 }
@@ -41,14 +41,14 @@ fetch('https://api.service.com/v1/users')
 If your endpoint returns a nested object, such as:
 ```json
 {
-	"name": "Decahedron Technologies Ltd.",
-	"email": "hello@decahedron.io",
-	"address": {
-		"street": "20-22 Wenlock Road",
-		"city": "London",
-		"zip": "N1 7GU",
-		"country": "United Kingdom"
-	}
+    "name": "Decahedron Technologies Ltd.",
+    "email": "hello@decahedron.io",
+    "address": {
+        "street": "20-22 Wenlock Road",
+        "city": "London",
+        "zip": "N1 7GU",
+        "country": "United Kingdom"
+    }
 }
 ```
 The JSON decoding process will _ignore_ the nested object (`address`). This also applies to arrays of objects (but **not** to arrays of primitives, which are automatically decoded).
@@ -63,13 +63,13 @@ class User extends Entity {
     public address: Address = null;
     
     public fromJson(jsonData: any): User {
-    	super.fromJson(jsonData);
+        super.fromJson(jsonData);
     	
-    	if (jsonData.hasOwnProperty('address')) {
-    	    this.address = EntityBuilder.buildOne<Address>(Address, jsonData['address']);
-    	}
-    	
-    	return this;
+        if (jsonData.hasOwnProperty('address')) {
+            this.address = EntityBuilder.buildOne<Address>(Address, jsonData['address']);
+        }
+
+        return this;
     }
 }
 ```
@@ -97,8 +97,14 @@ public homeAddress: Address = null;
 ```
 will assume that the json holds the key `home_address`. If that is not the case, it should be manually specified as the second argument to `@Type`.
 
-### Note about `Object`
+#### Note about `Object`
 If your entity has a nested object that is **not** represented by another entity, you can also use `@Type(Object)` to annotate that the object should simply be stored as is.
+
+### Encoding back to JSON
+
+Entity objects can also be encoded back to a plain JavaScript Object, or as a JSON string. You can call `toJson()` on any entity to convert it to a plain JS object.
+
+The method defaults to converting your properties to snake case. To prevent this, you can pass `false` as the first argument to `toJson()`. The method also accepts a second boolean argument that lets you specify if the output should instead be as a JSON string. `toJson(true, true)` is identical to `JSON.stringify(toJson(true))`.
 
 ## To-do
 - [ ] Create an `IEntity` interface that can be implemented
