@@ -38,6 +38,40 @@ var Entity = (function () {
     Entity.prototype.fromJson = function (jsonData) {
         return Entity.jsonParse(this, jsonData);
     };
+    Entity.prototype.toJson = function (toSnake, asString) {
+        if (toSnake === void 0) { toSnake = true; }
+        if (asString === void 0) { asString = false; }
+        var data = {};
+        for (var key in this) {
+            if (!this.hasOwnProperty(key)) {
+                continue;
+            }
+            var outputKey = toSnake ? StringHelper_1.StringHelper.toSnake(key) : key;
+            var value = this[key];
+            if (value instanceof Entity) {
+                data[outputKey] = value.toJson(toSnake, asString);
+                continue;
+            }
+            var metadata = storage_1.defaultMetadataStorage.findTypeMetadata(this.constructor, key);
+            if (value instanceof Array && value.length > 0 && value[0] instanceof Object) {
+                if (value[0] instanceof Entity) {
+                    data[outputKey] = value.map(function (entity) { return entity.toJson(toSnake, asString); });
+                }
+                if (metadata && metadata.type === Object) {
+                    data[outputKey] = value;
+                }
+                continue;
+            }
+            if (typeof value === 'object' && !(value instanceof Array)) {
+                if (metadata && metadata.type === Object) {
+                    data[outputKey] = value;
+                }
+                continue;
+            }
+            data[outputKey] = value;
+        }
+        return asString ? JSON.stringify(data) : data;
+    };
     return Entity;
 }());
 exports.Entity = Entity;

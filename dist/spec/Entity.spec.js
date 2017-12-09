@@ -68,45 +68,45 @@ var UserWithAnnotatedAddress = (function (_super) {
     function UserWithAnnotatedAddress() {
         return _super !== null && _super.apply(this, arguments) || this;
     }
-    __decorate([
-        Type_1.Type(Address),
-        __metadata("design:type", Address)
-    ], UserWithAnnotatedAddress.prototype, "address", void 0);
     return UserWithAnnotatedAddress;
 }(User));
+__decorate([
+    Type_1.Type(Address),
+    __metadata("design:type", Address)
+], UserWithAnnotatedAddress.prototype, "address", void 0);
 var UserWithAnnotatedPosts = (function (_super) {
     __extends(UserWithAnnotatedPosts, _super);
     function UserWithAnnotatedPosts() {
         return _super !== null && _super.apply(this, arguments) || this;
     }
-    __decorate([
-        Type_1.Type(Post),
-        __metadata("design:type", Array)
-    ], UserWithAnnotatedPosts.prototype, "posts", void 0);
     return UserWithAnnotatedPosts;
 }(User));
+__decorate([
+    Type_1.Type(Post),
+    __metadata("design:type", Array)
+], UserWithAnnotatedPosts.prototype, "posts", void 0);
 var UserWithAliasedPrimitive = (function (_super) {
     __extends(UserWithAliasedPrimitive, _super);
     function UserWithAliasedPrimitive() {
         return _super !== null && _super.apply(this, arguments) || this;
     }
-    __decorate([
-        Type_1.Type(String, 'second_name'),
-        __metadata("design:type", String)
-    ], UserWithAliasedPrimitive.prototype, "middleName", void 0);
     return UserWithAliasedPrimitive;
 }(User));
+__decorate([
+    Type_1.Type(String, 'second_name'),
+    __metadata("design:type", String)
+], UserWithAliasedPrimitive.prototype, "middleName", void 0);
 var UserWithAnnotatedObject = (function (_super) {
     __extends(UserWithAnnotatedObject, _super);
     function UserWithAnnotatedObject() {
         return _super !== null && _super.apply(this, arguments) || this;
     }
-    __decorate([
-        Type_1.Type(Object),
-        __metadata("design:type", Object)
-    ], UserWithAnnotatedObject.prototype, "address", void 0);
     return UserWithAnnotatedObject;
 }(User));
+__decorate([
+    Type_1.Type(Object),
+    __metadata("design:type", Object)
+], UserWithAnnotatedObject.prototype, "address", void 0);
 describe('Entity', function () {
     it('can decode a json payload into an entity', function () {
         var user = new User;
@@ -208,6 +208,110 @@ describe('Entity', function () {
         expect(user.address['city']).toEqual('London');
         expect(user.address['zip']).toEqual('N1 7GU');
         expect(user.address['country']).toEqual('United Kingdom');
+    });
+    it('can encode itself to a plain object', function () {
+        var user = new User;
+        user.fromJson({
+            name: 'Decahedron Technologies Ltd.',
+            email: 'hello@decahedron.io',
+            days_available: ['Monday', 'Wednesday', 'Friday']
+        });
+        expect(user.toJson())
+            .toEqual({
+            name: 'Decahedron Technologies Ltd.',
+            email: 'hello@decahedron.io',
+            days_available: ['Monday', 'Wednesday', 'Friday']
+        });
+    });
+    it('can encode itself to a plain object while maintaining camelCase', function () {
+        var user = new User;
+        user.fromJson({
+            name: 'Decahedron Technologies Ltd.',
+            email: 'hello@decahedron.io',
+            days_available: ['Monday', 'Wednesday', 'Friday']
+        });
+        expect(user.toJson(false))
+            .toEqual({
+            name: 'Decahedron Technologies Ltd.',
+            email: 'hello@decahedron.io',
+            daysAvailable: ['Monday', 'Wednesday', 'Friday']
+        });
+    });
+    it('can encode itself to a plain object and convert to a json string', function () {
+        var user = new User;
+        user.fromJson({
+            name: 'Decahedron Technologies Ltd.',
+            email: 'hello@decahedron.io',
+            days_available: ['Monday', 'Wednesday', 'Friday']
+        });
+        expect(user.toJson(true, true))
+            .toEqual(JSON.stringify({
+            name: 'Decahedron Technologies Ltd.',
+            email: 'hello@decahedron.io',
+            days_available: ['Monday', 'Wednesday', 'Friday']
+        }));
+    });
+    it('can encode itself to a plain object and convert to a json string without converting to snake case', function () {
+        var user = new User;
+        user.fromJson({
+            name: 'Decahedron Technologies Ltd.',
+            email: 'hello@decahedron.io',
+            days_available: ['Monday', 'Wednesday', 'Friday']
+        });
+        expect(user.toJson(false, true))
+            .toEqual(JSON.stringify({
+            name: 'Decahedron Technologies Ltd.',
+            email: 'hello@decahedron.io',
+            daysAvailable: ['Monday', 'Wednesday', 'Friday']
+        }));
+    });
+    it('can encode itself and its children to a plain object', function () {
+        var user = new UserWithAnnotatedAddress();
+        user.fromJson({
+            name: 'Decahedron Technologies Ltd.',
+            email: 'hello@decahedron.io',
+            days_available: ['Monday', 'Wednesday', 'Friday'],
+            address: {
+                street: '20-22 Wenlock Road',
+                city: 'London',
+                zip: 'N1 7GU',
+                country: 'United Kingdom'
+            }
+        });
+        expect(user.toJson())
+            .toEqual({
+            name: 'Decahedron Technologies Ltd.',
+            email: 'hello@decahedron.io',
+            days_available: ['Monday', 'Wednesday', 'Friday'],
+            address: {
+                street: '20-22 Wenlock Road',
+                city: 'London',
+                zip: 'N1 7GU',
+                country: 'United Kingdom'
+            }
+        });
+    });
+    it('can encode itself and its array children to a plain object', function () {
+        var user = new UserWithAnnotatedPosts();
+        user.fromJson({
+            name: 'Decahedron Technologies Ltd.',
+            email: 'hello@decahedron.io',
+            days_available: ['Monday', 'Wednesday', 'Friday'],
+            posts: [{
+                    title: 'About',
+                    content: 'Lorem ipsum dolor sit amet'
+                }]
+        });
+        expect(user.toJson())
+            .toEqual({
+            name: 'Decahedron Technologies Ltd.',
+            email: 'hello@decahedron.io',
+            days_available: ['Monday', 'Wednesday', 'Friday'],
+            posts: [{
+                    title: 'About',
+                    content: 'Lorem ipsum dolor sit amet'
+                }]
+        });
     });
 });
 //# sourceMappingURL=Entity.spec.js.map

@@ -165,4 +165,126 @@ describe('Entity', () => {
         expect(user.address['zip']).toEqual('N1 7GU');
         expect(user.address['country']).toEqual('United Kingdom');
     });
-})
+
+    it('can encode itself to a plain object', () => {
+      const user = new User;
+
+      user.fromJson({
+        name: 'Decahedron Technologies Ltd.',
+        email: 'hello@decahedron.io',
+        days_available: ['Monday', 'Wednesday', 'Friday']
+      });
+
+      expect(user.toJson())
+        .toEqual({
+          name: 'Decahedron Technologies Ltd.',
+          email: 'hello@decahedron.io',
+          days_available: ['Monday', 'Wednesday', 'Friday']
+        });
+    });
+
+  it('can encode itself to a plain object while maintaining camelCase', () => {
+    const user = new User;
+
+    user.fromJson({
+      name: 'Decahedron Technologies Ltd.',
+      email: 'hello@decahedron.io',
+      days_available: ['Monday', 'Wednesday', 'Friday']
+    });
+
+    expect(user.toJson(false))
+      .toEqual({
+        name: 'Decahedron Technologies Ltd.',
+        email: 'hello@decahedron.io',
+        daysAvailable: ['Monday', 'Wednesday', 'Friday']
+      });
+  });
+
+  it('can encode itself to a plain object and convert to a json string', () => {
+    const user = new User;
+
+    user.fromJson({
+      name: 'Decahedron Technologies Ltd.',
+      email: 'hello@decahedron.io',
+      days_available: ['Monday', 'Wednesday', 'Friday']
+    });
+
+    expect(user.toJson(true, true))
+      .toEqual(JSON.stringify({
+        name: 'Decahedron Technologies Ltd.',
+        email: 'hello@decahedron.io',
+        days_available: ['Monday', 'Wednesday', 'Friday']
+      }));
+  });
+
+  it('can encode itself to a plain object and convert to a json string without converting to snake case', () => {
+    const user = new User;
+
+    user.fromJson({
+      name: 'Decahedron Technologies Ltd.',
+      email: 'hello@decahedron.io',
+      days_available: ['Monday', 'Wednesday', 'Friday']
+    });
+
+    expect(user.toJson(false, true))
+      .toEqual(JSON.stringify({
+        name: 'Decahedron Technologies Ltd.',
+        email: 'hello@decahedron.io',
+        daysAvailable: ['Monday', 'Wednesday', 'Friday']
+      }));
+  });
+
+  it('can encode itself and its children to a plain object', () => {
+    const user = new UserWithAnnotatedAddress();
+
+    user.fromJson({
+      name: 'Decahedron Technologies Ltd.',
+      email: 'hello@decahedron.io',
+      days_available: ['Monday', 'Wednesday', 'Friday'],
+      address: {
+        street: '20-22 Wenlock Road',
+        city: 'London',
+        zip: 'N1 7GU',
+        country: 'United Kingdom'
+      }
+    });
+
+    expect(user.toJson())
+      .toEqual({
+        name: 'Decahedron Technologies Ltd.',
+        email: 'hello@decahedron.io',
+        days_available: ['Monday', 'Wednesday', 'Friday'],
+        address: {
+          street: '20-22 Wenlock Road',
+          city: 'London',
+          zip: 'N1 7GU',
+          country: 'United Kingdom'
+        }
+      });
+  });
+
+  it('can encode itself and its array children to a plain object', () => {
+    const user = new UserWithAnnotatedPosts();
+
+    user.fromJson({
+      name: 'Decahedron Technologies Ltd.',
+      email: 'hello@decahedron.io',
+      days_available: ['Monday', 'Wednesday', 'Friday'],
+      posts: [{
+        title: 'About',
+        content: 'Lorem ipsum dolor sit amet'
+      }]
+    });
+
+    expect(user.toJson())
+      .toEqual({
+        name: 'Decahedron Technologies Ltd.',
+        email: 'hello@decahedron.io',
+        days_available: ['Monday', 'Wednesday', 'Friday'],
+        posts: [{
+          title: 'About',
+          content: 'Lorem ipsum dolor sit amet'
+        }]
+      });
+  });
+});

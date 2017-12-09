@@ -59,7 +59,66 @@ export class Entity {
         return sourceObject;
     }
 
+  /**
+   * Convert JSON data to an Entity instance.
+   *
+   * @param jsonData
+   * @returns {any}
+   */
     fromJson(jsonData: any): any {
         return Entity.jsonParse(this, jsonData);
+    }
+
+  /**
+   * Convert an Entity to JSON, either in object or string format.
+   * @param {boolean} asString
+   * @returns {any}
+   */
+    toJson(toSnake: boolean = true, asString: boolean = false): any {
+        const data: any = {};
+
+        for (let key in this) {
+          if (! this.hasOwnProperty(key)) {
+              continue;
+          }
+
+          let outputKey = toSnake ? StringHelper.toSnake(key) : key;
+
+          const value: any = this[key];
+
+          if (value instanceof Entity) {
+              data[outputKey] = value.toJson(toSnake, asString);
+
+              continue;
+          }
+
+          const metadata: TypeMetadata = defaultMetadataStorage.findTypeMetadata(this.constructor, key);
+
+          if (value instanceof Array && value.length > 0 && value[0] instanceof Object) {
+            if (value[0] instanceof Entity) {
+              data[outputKey] = value.map((entity: Entity) => entity.toJson(toSnake, asString));
+            }
+
+            if (metadata && metadata.type === Object) {
+              data[outputKey] = value;
+            }
+
+            continue;
+          }
+
+          // If the key has been manually annotated as an object,
+          // we will simply output the object itself.
+          if (typeof value === 'object' && !(value instanceof Array)) {
+              if (metadata && metadata.type === Object) {
+                  data[outputKey] = value;
+              }
+
+              continue;
+          }
+
+          data[outputKey] = value;
+        }
+
+        return asString ? JSON.stringify(data) : data;
     }
 }
