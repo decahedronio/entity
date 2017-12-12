@@ -40,7 +40,7 @@ class UserWithAliasedPrimitive extends User {
 
 class UserWithAnnotatedObject extends User {
     @Type(Object)
-    public address: Object;
+    public address: {[key: string]: string};
 }
 
 describe('Entity', () => {
@@ -157,7 +157,7 @@ describe('Entity', () => {
                 zip: 'N1 7GU',
                 country: 'United Kingdom'
             }
-        })
+        });
 
         expect(user.address).toBeDefined();
         expect(user.address['street']).toEqual('20-22 Wenlock Road');

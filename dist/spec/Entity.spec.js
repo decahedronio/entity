@@ -68,45 +68,45 @@ var UserWithAnnotatedAddress = (function (_super) {
     function UserWithAnnotatedAddress() {
         return _super !== null && _super.apply(this, arguments) || this;
     }
+    __decorate([
+        Type_1.Type(Address),
+        __metadata("design:type", Address)
+    ], UserWithAnnotatedAddress.prototype, "address", void 0);
     return UserWithAnnotatedAddress;
 }(User));
-__decorate([
-    Type_1.Type(Address),
-    __metadata("design:type", Address)
-], UserWithAnnotatedAddress.prototype, "address", void 0);
 var UserWithAnnotatedPosts = (function (_super) {
     __extends(UserWithAnnotatedPosts, _super);
     function UserWithAnnotatedPosts() {
         return _super !== null && _super.apply(this, arguments) || this;
     }
+    __decorate([
+        Type_1.Type(Post),
+        __metadata("design:type", Array)
+    ], UserWithAnnotatedPosts.prototype, "posts", void 0);
     return UserWithAnnotatedPosts;
 }(User));
-__decorate([
-    Type_1.Type(Post),
-    __metadata("design:type", Array)
-], UserWithAnnotatedPosts.prototype, "posts", void 0);
 var UserWithAliasedPrimitive = (function (_super) {
     __extends(UserWithAliasedPrimitive, _super);
     function UserWithAliasedPrimitive() {
         return _super !== null && _super.apply(this, arguments) || this;
     }
+    __decorate([
+        Type_1.Type(String, 'second_name'),
+        __metadata("design:type", String)
+    ], UserWithAliasedPrimitive.prototype, "middleName", void 0);
     return UserWithAliasedPrimitive;
 }(User));
-__decorate([
-    Type_1.Type(String, 'second_name'),
-    __metadata("design:type", String)
-], UserWithAliasedPrimitive.prototype, "middleName", void 0);
 var UserWithAnnotatedObject = (function (_super) {
     __extends(UserWithAnnotatedObject, _super);
     function UserWithAnnotatedObject() {
         return _super !== null && _super.apply(this, arguments) || this;
     }
+    __decorate([
+        Type_1.Type(Object),
+        __metadata("design:type", Object)
+    ], UserWithAnnotatedObject.prototype, "address", void 0);
     return UserWithAnnotatedObject;
 }(User));
-__decorate([
-    Type_1.Type(Object),
-    __metadata("design:type", Object)
-], UserWithAnnotatedObject.prototype, "address", void 0);
 describe('Entity', function () {
     it('can decode a json payload into an entity', function () {
         var user = new User;
