@@ -12,7 +12,7 @@ export class Entity {
      * @param jsonObject
      * @returns {T}
      */
-    private static jsonParse<T>(sourceObject: T, jsonObject: Object): T {
+    private static jsonParse<T extends {[key: string]: any}>(sourceObject: T, jsonObject: any): T {
         for (let key in jsonObject) {
             if (jsonObject.hasOwnProperty(key)) {
                 const metadata: TypeMetadata = defaultMetadataStorage.findTypeMetadata(sourceObject.constructor, key);
