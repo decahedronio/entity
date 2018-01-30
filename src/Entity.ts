@@ -77,12 +77,12 @@ export class Entity {
     toJson(toSnake: boolean = true, asString: boolean = false): any {
         const data: any = {};
 
-        for (let key in this) {
+        for (const key in this) {
           if (! this.hasOwnProperty(key)) {
               continue;
           }
 
-          let outputKey = toSnake ? StringHelper.toSnake(key) : key;
+          const outputKey = toSnake ? StringHelper.toSnake(key) : key;
 
           const value: any = this[key];
 
