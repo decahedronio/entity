@@ -287,4 +287,52 @@ describe('Entity', () => {
         }]
       });
   });
+
+    it('should preserve null values for annotated attributes', function () {
+        const user = new UserWithAnnotatedAddress();
+
+        user.fromJson({
+            name: 'Decahedron Technologies Ltd.',
+            email: 'hello@decahedron.io',
+            days_available: ['Monday', 'Wednesday', 'Friday'],
+            address: null,
+        });
+
+        expect(user.toJson())
+          .toEqual({
+              name: 'Decahedron Technologies Ltd.',
+              email: 'hello@decahedron.io',
+              days_available: ['Monday', 'Wednesday', 'Friday'],
+              address: null,
+          });
+    });
+
+    it('should preserve null values for non-annotated attributes', function () {
+        const user = new UserWithAnnotatedAddress();
+
+        user.fromJson({
+            name: 'Decahedron Technologies Ltd.',
+            email: null,
+            days_available: ['Monday', 'Wednesday', 'Friday'],
+            address: {
+                street: '20-22 Wenlock Road',
+                city: 'London',
+                zip: 'N1 7GU',
+                country: 'United Kingdom'
+            }
+        });
+
+        expect(user.toJson())
+          .toEqual({
+              name: 'Decahedron Technologies Ltd.',
+              email: null,
+              days_available: ['Monday', 'Wednesday', 'Friday'],
+              address: {
+                  street: '20-22 Wenlock Road',
+                  city: 'London',
+                  zip: 'N1 7GU',
+                  country: 'United Kingdom'
+              }
+          });
+    });
 });
