@@ -11,7 +11,7 @@ var Entity = (function () {
             if (jsonObject.hasOwnProperty(key)) {
                 var metadata = storage_1.defaultMetadataStorage.findTypeMetadata(sourceObject.constructor, key);
                 var value = jsonObject[key];
-                if (typeof value === 'object' && !(value instanceof Array)) {
+                if (value !== null && typeof value === 'object' && !(value instanceof Array)) {
                     if (metadata) {
                         sourceObject[metadata.propertyName] = EntityBuilder_1.EntityBuilder.buildOne(metadata.type, value);
                     }
