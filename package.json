@@ -1,6 +1,6 @@
 {
   "name": "@decahedron/entity",
-  "version": "2.5.1",
+  "version": "2.5.2",
   "description": "A library to encode and decode JSON into entity classes",
   "main": "dist/index.js",
   "scripts": {
