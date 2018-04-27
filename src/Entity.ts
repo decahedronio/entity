@@ -20,7 +20,7 @@ export class Entity {
 
                 // We shouldn't copy objects to our entity, as the entity
                 // should be responsible for constructing these itself.
-                if (typeof value === 'object' && !(value instanceof Array)) {
+                if (value !== null && typeof value === 'object' && !(value instanceof Array)) {
                     if (metadata) {
                         sourceObject[metadata.propertyName] = EntityBuilder.buildOne(metadata.type, value);
                     }
