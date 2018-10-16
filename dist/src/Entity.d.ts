@@ -1,5 +1,5 @@
 export declare class Entity {
-    private static jsonParse<T>(sourceObject, jsonObject);
+    private static jsonParse;
     fromJson(jsonData: any): any;
     toJson(toSnake?: boolean, asString?: boolean): any;
 }
