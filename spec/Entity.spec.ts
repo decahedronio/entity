@@ -1,10 +1,17 @@
 import {Entity} from '../src/Entity';
 import {Type} from '../src/support/Type';
+import { EntityBuilder } from "../src/EntityBuilder";
 
 class User extends Entity {
     public name: string = null;
     public email: string = null;
     public daysAvailable: string[] = [];
+}
+
+class UserWithUnderscore extends Entity {
+    public name: string = null;
+    public email: string = null;
+    public days_available: string[] = [];
 }
 
 class Address extends Entity {
@@ -334,5 +341,22 @@ describe('Entity', () => {
                   country: 'United Kingdom'
               }
           });
+    });
+
+    it('can preserve input keys', () => {
+        const user = new UserWithUnderscore;
+
+        EntityBuilder.convertToCamel(false);
+
+        user.fromJson({
+            name: 'Decahedron Technologies Ltd.',
+            email: 'hello@decahedron.io',
+            days_available: ['Monday', 'Wednesday', 'Friday']
+        });
+
+        expect(user.name).toEqual('Decahedron Technologies Ltd.');
+        expect(user.email).toEqual('hello@decahedron.io');
+        expect(user.days_available).toEqual(['Monday', 'Wednesday', 'Friday']);
+        EntityBuilder.convertToCamel();
     });
 });

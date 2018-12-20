@@ -48,7 +48,7 @@ export class Entity {
                     continue;
                 }
 
-                key = StringHelper.toCamel(key);
+                key = EntityBuilder.enableCamelConversion ? StringHelper.toCamel(key) : key;
 
                 if (sourceObject.hasOwnProperty(key)) {
                     sourceObject[key] = value;
@@ -79,7 +79,7 @@ export class Entity {
 
         for (let key in this) {
           if (! this.hasOwnProperty(key)) {
-              continue;
+            continue;
           }
 
           let outputKey = toSnake ? StringHelper.toSnake(key) : key;
@@ -108,7 +108,7 @@ export class Entity {
 
           // If the key has been manually annotated as an object,
           // we will simply output the object itself.
-          if (typeof value === 'object' && !(value instanceof Array)) {
+          if (value !== null && typeof value === 'object' && !(value instanceof Array)) {
               if (metadata && metadata.type === Object) {
                   data[outputKey] = value;
               }

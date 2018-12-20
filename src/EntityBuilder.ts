@@ -1,4 +1,7 @@
 export class EntityBuilder {
+
+    public static enableCamelConversion = true;
+
     /**
      * Build an entity object from source data.
      *
@@ -29,6 +32,10 @@ export class EntityBuilder {
         this.checkClassValidity(buildClass);
 
         return sourceData.map(entityData => this.buildOne<T>(buildClass, entityData));
+    }
+
+    public static convertToCamel(convert = true) {
+        this.enableCamelConversion = convert;
     }
 
     /**
