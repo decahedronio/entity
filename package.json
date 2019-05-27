@@ -23,6 +23,7 @@
   "license": "MIT",
   "devDependencies": {
     "@types/jasmine": "^2.5.52",
+    "@types/node": "^11.11.4",
     "jasmine": "^2.6.0",
     "typescript": "^2.0"
   }
