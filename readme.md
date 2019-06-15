@@ -106,6 +106,62 @@ Entity objects can also be encoded back to a plain JavaScript Object, or as a JS
 
 The method defaults to converting your properties to snake case. To prevent this, you can pass `false` as the first argument to `toJson()`. The method also accepts a second boolean argument that lets you specify if the output should instead be as a JSON string. `toJson(true, true)` is identical to `JSON.stringify(toJson(true))`.
 
+### Circular dependency issue
+
+Because Javascript cannot handle circular dependencies, two related entities cannot annotate each other via the ways shown above. Since v2.7.0, Decahedron Entity solves this issue by importing entity classes only when an entity instance is being built. So instead of importing them at top-level (which would not work as expected):
+
+```typescript
+/* Blog.ts */
+import { Entity, Type } from '@decahedron/entity';
+import Comment from './Comment';
+
+export default class Blog extends Entity {
+    // ...
+
+    @Type(Comment)
+    public comments: Comment[] = null;
+}
+
+/* Comment.ts */
+import { Entity, Type } from '@decahedron/entity';
+import Blog from './Blog';
+
+export default class Comment extends Entity {
+    // ...
+
+    @Type(Blog)
+    public blog: Blog = null;
+}
+```
+
+You can now annotate them with an anonymous importer function:
+
+```typescript
+/* Blog.ts */
+import { Entity, Type } from '@decahedron/entity';
+
+// You still need to import the annotated class to prevent Typescript and your IDE complaining about it.
+import Comment from './Comment';
+
+export default class Blog extends Entity {
+    // ...
+
+    @Type(() => require('./Comment'))
+    public comments: Comment[] = null;
+}
+
+/* Comment.ts */
+import { Entity, Type } from '@decahedron/entity';
+import Blog from './Blog';
+
+export default class Comment extends Entity {
+    // ...
+
+    @Type(() => require('./Blog'))
+    public blog: Blog = null;
+}
+```
+
 ## To-do
 - [ ] Create an `IEntity` interface that can be implemented
 
