@@ -1,5 +1,12 @@
 import { TypeMetadata } from './TypeMetadata';
 
+export class DefaultValueCallbackMetadata {
+    constructor(public target: Function,
+                public propertyName: string,
+                public callback: () => any,
+                public condition: (value: any) => boolean) {}
+}
+
 /**
  * Storage all library metadata.
  */
@@ -11,6 +18,7 @@ export class MetadataStorage {
      * @type {Array}
      */
     private typeMetadatas: TypeMetadata[] = [];
+    private defaultCallbacks: DefaultValueCallbackMetadata[] = [];
 
     /**
      * Append type metadata.
@@ -19,6 +27,10 @@ export class MetadataStorage {
      */
     addTypeMetadata(metadata: TypeMetadata) {
         this.typeMetadatas.push(metadata);
+    }
+
+    addDefaultCallback(callbackMetadata: DefaultValueCallbackMetadata) {
+        this.defaultCallbacks.push(callbackMetadata);
     }
 
     /**
@@ -38,5 +50,10 @@ export class MetadataStorage {
         );
 
         return metadataFromTarget || metadataFromChildren;
+    }
+
+    findCallback(target: any, propertyName: string): DefaultValueCallbackMetadata|undefined {
+        return this.defaultCallbacks.find(cbmeta => cbmeta.target === target && cbmeta.propertyName === propertyName) ||
+            this.defaultCallbacks.find(cbmeta => target.prototype instanceof cbmeta.target && cbmeta.propertyName === propertyName);
     }
 }

@@ -53,6 +53,11 @@ export class Entity {
                 if (sourceObject.hasOwnProperty(key)) {
                     sourceObject[key] = value;
                 }
+
+                const defaultValueCallback = defaultMetadataStorage.findCallback(sourceObject.constructor, key);
+                if (defaultValueCallback && defaultValueCallback.condition(sourceObject[key]) ) {
+                    sourceObject[key] = defaultValueCallback.callback();
+                }
             }
         }
 
@@ -71,6 +76,7 @@ export class Entity {
 
   /**
    * Convert an Entity to JSON, either in object or string format.
+   * @param {boolean} toSnake
    * @param {boolean} asString
    * @returns {any}
    */

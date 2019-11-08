@@ -1,6 +1,7 @@
 import {Entity} from '../src/Entity';
 import {Type} from '../src/support/Type';
 import { EntityBuilder } from "../src/EntityBuilder";
+import {Default} from "../src/support/Default";
 
 class User extends Entity {
     public name: string = null;
@@ -48,6 +49,11 @@ class UserWithAliasedPrimitive extends User {
 class UserWithAnnotatedObject extends User {
     @Type(Object)
     public address: {[key: string]: string};
+}
+
+class UserWithDefaultValue extends User {
+    @Default(() => 'hi')
+    public value: string = null;
 }
 
 describe('Entity', () => {
@@ -358,5 +364,12 @@ describe('Entity', () => {
         expect(user.email).toEqual('hello@decahedron.io');
         expect(user.days_available).toEqual(['Monday', 'Wednesday', 'Friday']);
         EntityBuilder.convertToCamel();
+    });
+
+    it('should assign a default value to properties with a null value', function () {
+        const user = new UserWithDefaultValue;
+        user.fromJson({ value: null });
+
+        expect(user.value).toEqual('hi');
     });
 });
