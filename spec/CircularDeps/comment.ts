@@ -5,6 +5,6 @@ import { BlogPost } from './blog';
 export class Comment extends Entity {
     public body: string = null;
 
-    @Type(() => require('./blog').BlogPost)
+    @Type(async () => (await import('./blog')).BlogPost)
     public blog: BlogPost = null;
 }

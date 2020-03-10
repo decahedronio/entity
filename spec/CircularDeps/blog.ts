@@ -6,6 +6,6 @@ export class BlogPost extends Entity {
     public title: string = null;
     public body: string = null;
 
-    @Type(() => require('./comment').Comment)
+    @Type(async () => (await import('./comment')).Comment)
     public comments: Comment[] = [];
 }

@@ -9,15 +9,15 @@ export class EntityBuilder {
      * @param sourceData
      * @returns {any}
      */
-    public static buildOne<T>(buildClass: any, sourceData: Object): T | any {
-        this.checkClassValidity(buildClass);
+    public static async buildOne<T>(buildClass: any, sourceData: Object): Promise<T | any> {
+        this.checkClassValidity(await buildClass);
 
-        if (buildClass === Object) {
+        if ((await buildClass) === Object) {
             return sourceData;
         }
 
-        const entity: any = new buildClass();
-        entity.fromJson(sourceData);
+        const entity: any = new (await buildClass)();
+        await entity.fromJson(sourceData);
 
         return entity;
     }
@@ -28,10 +28,10 @@ export class EntityBuilder {
      * @param sourceData
      * @returns {any[]}
      */
-    public static buildMany<T>(buildClass: any, sourceData: Object[]): T[] {
-        this.checkClassValidity(buildClass);
+    public static async buildMany<T>(buildClass: any, sourceData: Object[]): Promise<T[]> {
+        this.checkClassValidity(await buildClass);
 
-        return sourceData.map(entityData => this.buildOne<T>(buildClass, entityData));
+        return Promise.all(sourceData.map(entityData => this.buildOne<T>(buildClass, entityData)));
     }
 
     public static convertToCamel(convert = true) {

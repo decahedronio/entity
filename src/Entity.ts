@@ -12,7 +12,7 @@ export class Entity {
      * @param jsonObject
      * @returns {T}
      */
-    private static jsonParse<T extends {[key: string]: any}>(sourceObject: T, jsonObject: any): T {
+    private static async jsonParse<T extends {[key: string]: any}>(sourceObject: T, jsonObject: any): Promise<T> {
         for (let key in jsonObject) {
             if (jsonObject.hasOwnProperty(key)) {
                 const metadata: TypeMetadata = defaultMetadataStorage.findTypeMetadata(sourceObject.constructor, key);
@@ -22,7 +22,7 @@ export class Entity {
                 // should be responsible for constructing these itself.
                 if (value !== null && typeof value === 'object' && !(value instanceof Array)) {
                     if (metadata) {
-                        sourceObject[metadata.propertyName] = EntityBuilder.buildOne(metadata.type, value);
+                        sourceObject[metadata.propertyName] = await EntityBuilder.buildOne(metadata.type, value);
                     }
 
                     continue;
@@ -33,7 +33,7 @@ export class Entity {
                 // responsible to construct the array of entities.
                 if (value instanceof Array && value.length > 0 && typeof value[0] === 'object') {
                     if (metadata) {
-                        sourceObject[metadata.propertyName] = EntityBuilder.buildMany(metadata.type, value);
+                        sourceObject[metadata.propertyName] = await EntityBuilder.buildMany(metadata.type, value);
                     }
 
                     continue;
@@ -70,7 +70,7 @@ export class Entity {
    * @param jsonData
    * @returns {any}
    */
-    fromJson(jsonData: any): any {
+    fromJson(jsonData: any): Promise<any> {
         return Entity.jsonParse(this, jsonData);
     }
 

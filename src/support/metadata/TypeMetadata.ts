@@ -2,25 +2,27 @@ export class TypeMetadata {
     constructor(public target: Function,
                 public propertyName: string,
                 public sourcePropertyName: string,
-                private _type: Function) {
+                private _type: Function | Promise<Function>) {
     }
 
-    public get type(): Function
+    public get type(): Promise<Function> | Function
     {
         // If type name is empty, we will assume it returns a resolver function.
-        if (!this._type.name.length) {
+        const typePromise = this._type as Promise<Function>;
+        const typeFunction = this._type as Function;
+        if (typePromise.then || !typeFunction.name.length) {
             return this.resolveDeferredType();
         }
 
         return this._type;
     }
 
-    private resolveDeferredType(): Function
+    private async resolveDeferredType(): Promise<Function>
     {
         // Run the function to actually import the module and assign the module
         // to type prop so that the EntityBuilder will actually get an entity
         // constructor, and not a resolver function.
-        const type = this._type();
+        const type = await (await this._type)();
 
         // Assuming that deferred type is resolved via a 'require' function,
         // if it is *not* appended by a key, like below...

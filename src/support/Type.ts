@@ -3,7 +3,7 @@ import { EntityBuilder } from '../EntityBuilder';
 import { StringHelper } from './StringHelper';
 import { TypeMetadata } from './metadata/TypeMetadata';
 
-export function Type(type?: Function, jsonKey?: string) {
+export function Type(type?: Function | Promise<Function>, jsonKey?: string) {
     return function (target: any, key: string) {
         jsonKey = jsonKey ? jsonKey : (
             EntityBuilder.enableCamelConversion ? StringHelper.toSnake(key) : key
