@@ -56,11 +56,11 @@ class UserWithDefaultValue extends User {
     public value: string = null;
 }
 
-describe('Entity', async () => {
-    it('can decode a json payload into an entity', async () => {
+describe('Entity', () => {
+    it('can decode a json payload into an entity', () => {
         const user = new User;
 
-        await user.fromJson({
+        user.fromJson({
             name: 'Decahedron Technologies Ltd.',
             email: 'hello@decahedron.io',
             days_available: ['Monday', 'Wednesday', 'Friday']
@@ -71,10 +71,10 @@ describe('Entity', async () => {
         expect(user.daysAvailable).toEqual(['Monday', 'Wednesday', 'Friday']);
     });
 
-    it('does not decode a nested object', async () => {
+    it('does not decode a nested object', () => {
         const user = new UserWithAddress;
 
-        await user.fromJson({
+        user.fromJson({
             name: 'Decahedron Technologies Ltd.',
             email: 'hello@decahedron.io',
             days_available: ['Monday', 'Wednesday', 'Friday'],
@@ -89,10 +89,10 @@ describe('Entity', async () => {
         expect(user.address).toBeNull();
     });
 
-    it('decodes an annotated nested object', async () => {
+    it('decodes an annotated nested object', () => {
         const user = new UserWithAnnotatedAddress();
 
-        await user.fromJson({
+        user.fromJson({
             name: 'Decahedron Technologies Ltd.',
             email: 'hello@decahedron.io',
             days_available: ['Monday', 'Wednesday', 'Friday'],
@@ -111,10 +111,10 @@ describe('Entity', async () => {
         expect(user.address.country).toEqual('United Kingdom');
     });
 
-    it('decodes an annotated optional nested array object', async () => {
+    it('decodes an annotated optional nested array object', () => {
         const user = new UserWithAnnotatedPosts();
 
-        await user.fromJson({
+        user.fromJson({
             name: 'Decahedron Technologies Ltd.',
             email: 'hello@decahedron.io',
             days_available: ['Monday', 'Wednesday', 'Friday'],
@@ -130,10 +130,10 @@ describe('Entity', async () => {
         expect(user.posts[0].content).toEqual('Lorem ipsum dolor sit amet');
     });
 
-    it('decodes an annotated optional nested array object to empty array', async () => {
+    it('decodes an annotated optional nested array object to empty array', () => {
         const user = new UserWithAnnotatedPosts();
 
-        await user.fromJson({
+        user.fromJson({
             name: 'Decahedron Technologies Ltd.',
             email: 'hello@decahedron.io',
             days_available: ['Monday', 'Wednesday', 'Friday'],
@@ -144,10 +144,10 @@ describe('Entity', async () => {
         expect(user.posts).toEqual([]);
     });
 
-    it('interprets an annotated primitive as an alias', async () => {
+    it('interprets an annotated primitive as an alias', () => {
         const user = new UserWithAliasedPrimitive();
 
-        await user.fromJson({
+        user.fromJson({
             name: 'Decahedron Technologies Ltd',
             email: 'hello@decahedron.io',
             days_available: ['Monday', 'Wednesday', 'Friday'],
@@ -157,10 +157,10 @@ describe('Entity', async () => {
         expect(user.middleName).toEqual('A Middle Name');
     });
 
-    it('can decode an annotated Object, without being an entity', async () => {
+    it('can decode an annotated Object, without being an entity', () => {
         const user = new UserWithAnnotatedObject();
 
-        await user.fromJson({
+        user.fromJson({
             name: 'Decahedron Technologies Ltd',
             email: 'hello@decahedron.io',
             days_available: ['Monday', 'Wednesday', 'Friday'],
@@ -179,10 +179,10 @@ describe('Entity', async () => {
         expect(user.address['country']).toEqual('United Kingdom');
     });
 
-    it('can encode itself to a plain object', async () => {
+    it('can encode itself to a plain object', () => {
       const user = new User;
 
-      await user.fromJson({
+      user.fromJson({
         name: 'Decahedron Technologies Ltd.',
         email: 'hello@decahedron.io',
         days_available: ['Monday', 'Wednesday', 'Friday']
@@ -196,10 +196,10 @@ describe('Entity', async () => {
         });
     });
 
-  it('can encode itself to a plain object while maintaining camelCase', async () => {
+  it('can encode itself to a plain object while maintaining camelCase', () => {
     const user = new User;
 
-    await user.fromJson({
+    user.fromJson({
       name: 'Decahedron Technologies Ltd.',
       email: 'hello@decahedron.io',
       days_available: ['Monday', 'Wednesday', 'Friday']
@@ -213,10 +213,10 @@ describe('Entity', async () => {
       });
   });
 
-  it('can encode itself to a plain object and convert to a json string', async () => {
+  it('can encode itself to a plain object and convert to a json string', () => {
     const user = new User;
 
-    await user.fromJson({
+    user.fromJson({
       name: 'Decahedron Technologies Ltd.',
       email: 'hello@decahedron.io',
       days_available: ['Monday', 'Wednesday', 'Friday']
@@ -230,10 +230,10 @@ describe('Entity', async () => {
       }));
   });
 
-  it('can encode itself to a plain object and convert to a json string without converting to snake case', async () => {
+  it('can encode itself to a plain object and convert to a json string without converting to snake case', () => {
     const user = new User;
 
-    await user.fromJson({
+    user.fromJson({
       name: 'Decahedron Technologies Ltd.',
       email: 'hello@decahedron.io',
       days_available: ['Monday', 'Wednesday', 'Friday']
@@ -247,10 +247,10 @@ describe('Entity', async () => {
       }));
   });
 
-  it('can encode itself and its children to a plain object', async () => {
+  it('can encode itself and its children to a plain object', () => {
     const user = new UserWithAnnotatedAddress();
 
-    await user.fromJson({
+    user.fromJson({
       name: 'Decahedron Technologies Ltd.',
       email: 'hello@decahedron.io',
       days_available: ['Monday', 'Wednesday', 'Friday'],
@@ -276,10 +276,10 @@ describe('Entity', async () => {
       });
   });
 
-  it('can encode itself and its array children to a plain object', async () => {
+  it('can encode itself and its array children to a plain object', () => {
     const user = new UserWithAnnotatedPosts();
 
-    await user.fromJson({
+    user.fromJson({
       name: 'Decahedron Technologies Ltd.',
       email: 'hello@decahedron.io',
       days_available: ['Monday', 'Wednesday', 'Friday'],
@@ -301,10 +301,10 @@ describe('Entity', async () => {
       });
   });
 
-    it('should preserve null values for annotated attributes', async () => {
+    it('should preserve null values for annotated attributes', () => {
         const user = new UserWithAnnotatedAddress();
 
-        await user.fromJson({
+        user.fromJson({
             name: 'Decahedron Technologies Ltd.',
             email: 'hello@decahedron.io',
             days_available: ['Monday', 'Wednesday', 'Friday'],
@@ -320,10 +320,10 @@ describe('Entity', async () => {
           });
     });
 
-    it('should preserve null values for non-annotated attributes', async () => {
+    it('should preserve null values for non-annotated attributes', () => {
         const user = new UserWithAnnotatedAddress();
 
-        await user.fromJson({
+        user.fromJson({
             name: 'Decahedron Technologies Ltd.',
             email: null,
             days_available: ['Monday', 'Wednesday', 'Friday'],
@@ -349,12 +349,12 @@ describe('Entity', async () => {
           });
     });
 
-    it('can preserve input keys', async () => {
+    it('can preserve input keys', () => {
         const user = new UserWithUnderscore;
 
         EntityBuilder.convertToCamel(false);
 
-        await user.fromJson({
+        user.fromJson({
             name: 'Decahedron Technologies Ltd.',
             email: 'hello@decahedron.io',
             days_available: ['Monday', 'Wednesday', 'Friday']
@@ -366,9 +366,9 @@ describe('Entity', async () => {
         EntityBuilder.convertToCamel();
     });
 
-    it('should assign a default value to properties with a null value', async () => {
+    it('should assign a default value to properties with a null value', () => {
         const user = new UserWithDefaultValue;
-        await user.fromJson({ value: null });
+        user.fromJson({ value: null });
 
         expect(user.value).toEqual('hi');
     });

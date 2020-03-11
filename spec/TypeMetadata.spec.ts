@@ -14,6 +14,11 @@ class UserWithRegularNestedEntity extends Entity {
     public address: Address;
 }
 
+class UserWithRegularAsyncNestedEntity extends Entity {
+    @Type(async () => await Address)
+    public address: Address;
+}
+
 class UserWithDeferredNestedEntity extends Entity {
     @Type(() => Address)
     public address: Address;
@@ -30,31 +35,40 @@ class UserWithFaultyDeferredObjectOfNestedEntity extends Entity {
 }
 
 describe('TypeMetadata', async () => {
-    it('returns type as is when an entity constructor is given', async () => {
+    it('returns type as is when an entity constructor is given', () => {
         const metadata = defaultMetadataStorage.findTypeMetadata(
             UserWithRegularNestedEntity,
             'address'
         );
 
-        expect(await metadata.type).toBe(Address);
+        expect(metadata.type).toBe(Address);
     });
 
-    it('resolves type when a resolver function is given', async () => {
+    it('resolves type when a resolver function is given', () => {
         const metadata = defaultMetadataStorage.findTypeMetadata(
             UserWithDeferredNestedEntity,
             'address'
         );
 
+        expect(metadata.type).toBe(Address);
+    });
+
+    it('resolves type when an async resolver function is given', async () => {
+        const metadata = defaultMetadataStorage.findTypeMetadata(
+            UserWithRegularAsyncNestedEntity,
+            'address'
+        );
+
         expect(await metadata.type).toBe(Address);
     });
 
-    it('resolves type when a resolver function that returns an object is given', async () => {
+    it('resolves type when a resolver function that returns an object is given', () => {
         const metadata = defaultMetadataStorage.findTypeMetadata(
             UserWithDeferredObjectOfNestedEntity,
             'address'
         );
 
-        expect(await metadata.type).toBe(Address);
+        expect(metadata.type).toBe(Address);
     });
 
     it('cannot resolve type when a resolver function that returns an object without the "default" key is given', async () => {
@@ -66,6 +80,6 @@ describe('TypeMetadata', async () => {
         // We expect it to be undefined, because TypeMetadata will see an object
         // and will try to return `.default` but this type definition does not
         // have a "default" key.
-        expect(await metadata.type).toBeUndefined();
+        expect(metadata.type).toBeUndefined();
     });
 });

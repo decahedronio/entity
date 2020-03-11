@@ -5,14 +5,25 @@ import { StringHelper } from './support/StringHelper';
 
 export class Entity {
 
+    private static async jsonParseAsync<T extends {[key: string]: any}>(sourceObject: T, jsonObject: any): Promise<T> {
+        const obj = Entity.jsonParse<T>(sourceObject, jsonObject, true);
+        for (const key in obj) {
+            if (obj.hasOwnProperty(key)) {
+                obj[key] = await obj[key];
+            }
+        }
+        return obj;
+    }
+
     /**
      * Parse a generic object into an entity object.
      *
      * @param sourceObject
      * @param jsonObject
+     * @param async
      * @returns {T}
      */
-    private static async jsonParse<T extends {[key: string]: any}>(sourceObject: T, jsonObject: any): Promise<T> {
+    private static jsonParse<T extends {[key: string]: any}>(sourceObject: T, jsonObject: any, async = false): T {
         for (let key in jsonObject) {
             if (jsonObject.hasOwnProperty(key)) {
                 const metadata: TypeMetadata = defaultMetadataStorage.findTypeMetadata(sourceObject.constructor, key);
@@ -22,7 +33,9 @@ export class Entity {
                 // should be responsible for constructing these itself.
                 if (value !== null && typeof value === 'object' && !(value instanceof Array)) {
                     if (metadata) {
-                        sourceObject[metadata.propertyName] = await EntityBuilder.buildOne(metadata.type, value);
+                        sourceObject[metadata.propertyName] = async
+                            ? EntityBuilder.buildOneAsync(metadata.type, value)
+                            : EntityBuilder.buildOne(metadata.type, value);
                     }
 
                     continue;
@@ -33,7 +46,9 @@ export class Entity {
                 // responsible to construct the array of entities.
                 if (value instanceof Array && value.length > 0 && typeof value[0] === 'object') {
                     if (metadata) {
-                        sourceObject[metadata.propertyName] = await EntityBuilder.buildMany(metadata.type, value);
+                        sourceObject[metadata.propertyName] = async
+                            ? EntityBuilder.buildManyAsync(metadata.type, value)
+                            : EntityBuilder.buildMany(metadata.type, value);
                     }
 
                     continue;
@@ -55,7 +70,7 @@ export class Entity {
                 }
 
                 const defaultValueCallback = defaultMetadataStorage.findCallback(sourceObject.constructor, key);
-                if (defaultValueCallback && defaultValueCallback.condition(sourceObject[key]) ) {
+                if (defaultValueCallback && defaultValueCallback.condition(sourceObject[key])) {
                     sourceObject[key] = defaultValueCallback.callback();
                 }
             }
@@ -64,65 +79,77 @@ export class Entity {
         return sourceObject;
     }
 
-  /**
-   * Convert JSON data to an Entity instance.
-   *
-   * @param jsonData
-   * @returns {any}
-   */
-    fromJson(jsonData: any): Promise<any> {
+    /**
+     * Convert JSON data to an Entity instance.
+     *
+     * @param jsonData
+     * @returns {any}
+     */
+    fromJson(jsonData: any): any {
         return Entity.jsonParse(this, jsonData);
     }
 
-  /**
-   * Convert an Entity to JSON, either in object or string format.
-   * @param {boolean} toSnake
-   * @param {boolean} asString
-   * @returns {any}
-   */
+
+    /**
+     * Convert JSON data to an Entity instance that has async types.
+     *
+     * @param jsonData
+     * @returns {any}
+     */
+    fromJsonAsync(jsonData: any): Promise<any> {
+        return Entity.jsonParseAsync(this, jsonData);
+    }
+
+
+    /**
+     * Convert an Entity to JSON, either in object or string format.
+     * @param {boolean} toSnake
+     * @param {boolean} asString
+     * @returns {any}
+     */
     toJson(toSnake: boolean = true, asString: boolean = false): any {
         const data: any = {};
 
         for (let key in this) {
-          if (! this.hasOwnProperty(key)) {
-            continue;
-          }
-
-          let outputKey = toSnake ? StringHelper.toSnake(key) : key;
-
-          const value: any = this[key];
-
-          if (value instanceof Entity) {
-              data[outputKey] = value.toJson(toSnake, asString);
-
-              continue;
-          }
-
-          const metadata: TypeMetadata = defaultMetadataStorage.findTypeMetadata(this.constructor, key);
-
-          if (value instanceof Array && value.length > 0 && value[0] instanceof Object) {
-            if (value[0] instanceof Entity) {
-              data[outputKey] = value.map((entity: Entity) => entity.toJson(toSnake, asString));
+            if (!this.hasOwnProperty(key)) {
+                continue;
             }
 
-            if (metadata && metadata.type === Object) {
-              data[outputKey] = value;
+            let outputKey = toSnake ? StringHelper.toSnake(key) : key;
+
+            const value: any = this[key];
+
+            if (value instanceof Entity) {
+                data[outputKey] = value.toJson(toSnake, asString);
+
+                continue;
             }
 
-            continue;
-          }
+            const metadata: TypeMetadata = defaultMetadataStorage.findTypeMetadata(this.constructor, key);
 
-          // If the key has been manually annotated as an object,
-          // we will simply output the object itself.
-          if (value !== null && typeof value === 'object' && !(value instanceof Array)) {
-              if (metadata && metadata.type === Object) {
-                  data[outputKey] = value;
-              }
+            if (value instanceof Array && value.length > 0 && value[0] instanceof Object) {
+                if (value[0] instanceof Entity) {
+                    data[outputKey] = value.map((entity: Entity) => entity.toJson(toSnake, asString));
+                }
 
-              continue;
-          }
+                if (metadata && metadata.type === Object) {
+                    data[outputKey] = value;
+                }
 
-          data[outputKey] = value;
+                continue;
+            }
+
+            // If the key has been manually annotated as an object,
+            // we will simply output the object itself.
+            if (value !== null && typeof value === 'object' && !(value instanceof Array)) {
+                if (metadata && metadata.type === Object) {
+                    data[outputKey] = value;
+                }
+
+                continue;
+            }
+
+            data[outputKey] = value;
         }
 
         return asString ? JSON.stringify(data) : data;

@@ -5,7 +5,7 @@ describe('Entity with circular dependency', async () => {
     it('decodes an annotated nested object', async () => {
         const blog = new BlogPost();
 
-        await blog.fromJson({
+        await blog.fromJsonAsync({
             title: 'Decahedron/Entity gets circdep',
             body: 'hooray!',
             comments: [
