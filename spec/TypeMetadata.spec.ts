@@ -71,7 +71,7 @@ describe('TypeMetadata', async () => {
         expect(metadata.type).toBe(Address);
     });
 
-    it('cannot resolve type when a resolver function that returns an object without the "default" key is given', async () => {
+    it('cannot resolve type when a resolver function that returns an object without the "default" key is given', () => {
         const metadata = defaultMetadataStorage.findTypeMetadata(
             UserWithFaultyDeferredObjectOfNestedEntity,
             'address'
