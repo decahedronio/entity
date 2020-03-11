@@ -162,6 +162,43 @@ export default class Comment extends Entity {
 }
 ```
 
+If you are in a browser environment and you cannot use require, you can instead use `import()`. Make sure you call the async functions of `Entity` and `EntityBuilder` instead.
+
+```typescript
+
+/* Blog.ts */
+import { Entity, Type } from '@decahedron/entity';
+
+// You still need to import the annotated class to prevent Typescript and your IDE complaining about it.
+import Comment from './Comment';
+
+export default class Blog extends Entity {
+    // ...
+
+    @Type(() => import('./Comment'))
+    public comments: Comment[] = null;
+}
+
+/* Comment.ts */
+import { Entity, Type } from '@decahedron/entity';
+import Blog from './Blog';
+
+export default class Comment extends Entity {
+    // ...
+
+    @Type(() => import('./Blog'))
+    public blog: Blog = null;
+}
+
+import { EntityBuilder } from '@decahedron/entity';
+import Blog from './Blog';
+
+/* somewhere else */
+EntityBuilder.buildOneAsync(Blog, json);
+EntityBuilder.buildManyAsync(Comment, json);
+Blog.fromJsonAsync(json)
+```
+
 ## To-do
 - [ ] Create an `IEntity` interface that can be implemented
 
