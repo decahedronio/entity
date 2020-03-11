@@ -34,7 +34,7 @@ class UserWithFaultyDeferredObjectOfNestedEntity extends Entity {
     public address: Address;
 }
 
-describe('TypeMetadata', async () => {
+describe('TypeMetadata', () => {
     it('returns type as is when an entity constructor is given', () => {
         const metadata = defaultMetadataStorage.findTypeMetadata(
             UserWithRegularNestedEntity,
