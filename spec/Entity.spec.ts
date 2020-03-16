@@ -301,7 +301,7 @@ describe('Entity', () => {
       });
   });
 
-    it('should preserve null values for annotated attributes', function () {
+    it('should preserve null values for annotated attributes', () => {
         const user = new UserWithAnnotatedAddress();
 
         user.fromJson({
@@ -320,7 +320,7 @@ describe('Entity', () => {
           });
     });
 
-    it('should preserve null values for non-annotated attributes', function () {
+    it('should preserve null values for non-annotated attributes', () => {
         const user = new UserWithAnnotatedAddress();
 
         user.fromJson({
@@ -366,7 +366,7 @@ describe('Entity', () => {
         EntityBuilder.convertToCamel();
     });
 
-    it('should assign a default value to properties with a null value', function () {
+    it('should assign a default value to properties with a null value', () => {
         const user = new UserWithDefaultValue;
         user.fromJson({ value: null });
 

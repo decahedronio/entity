@@ -16,8 +16,22 @@ export class EntityBuilder {
             return sourceData;
         }
 
-        const entity: any = new buildClass();
+        const entity: any = new (buildClass)();
         entity.fromJson(sourceData);
+
+        return entity;
+    }
+
+    public static async buildOneAsync<T>(buildClass: any, sourceData: Object): Promise<T | any> {
+        buildClass = await buildClass;
+        this.checkClassValidity(buildClass);
+
+        if (buildClass === Object) {
+            return sourceData;
+        }
+
+        const entity: any = new (buildClass)();
+        await entity.fromJsonAsync(sourceData);
 
         return entity;
     }
@@ -32,6 +46,19 @@ export class EntityBuilder {
         this.checkClassValidity(buildClass);
 
         return sourceData.map(entityData => this.buildOne<T>(buildClass, entityData));
+    }
+
+    /**
+     * Build multiple entities from an array of source data.
+     * @param buildClass
+     * @param sourceData
+     * @returns {any[]}
+     */
+    public static async buildManyAsync<T>(buildClass: any, sourceData: Object[]): Promise<T[]> {
+        buildClass = await buildClass;
+        this.checkClassValidity(buildClass);
+
+        return Promise.all(sourceData.map(entityData => this.buildOneAsync<T>(buildClass, entityData)));
     }
 
     public static convertToCamel(convert = true) {
