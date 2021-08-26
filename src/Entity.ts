@@ -115,6 +115,11 @@ export class Entity {
                 continue;
             }
 
+            // exclude any properties with `@JsonExclude()`
+            if (defaultMetadataStorage.isPropertyExcluded(this.constructor, key)) {
+                continue;
+            }
+
             let outputKey = toSnake ? StringHelper.toSnake(key) : key;
 
             const value: any = this[key];

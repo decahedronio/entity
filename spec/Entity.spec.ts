@@ -2,6 +2,7 @@ import {Entity} from '../src/Entity';
 import {Type} from '../src/support/Type';
 import { EntityBuilder } from "../src/EntityBuilder";
 import {Default} from "../src/support/Default";
+import {JsonExclude} from '../src/support/JsonExclude';
 
 class User extends Entity {
     public name: string = null;
@@ -54,6 +55,11 @@ class UserWithAnnotatedObject extends User {
 class UserWithDefaultValue extends User {
     @Default(() => 'hi')
     public value: string = null;
+}
+
+class UserWithExcludedOutput extends User {
+    @JsonExclude()
+    public value: string = 'test';
 }
 
 describe('Entity', () => {
@@ -372,4 +378,13 @@ describe('Entity', () => {
 
         expect(user.value).toEqual('hi');
     });
+
+    it('excludes @JsonExclude annotated keys from the output object', () => {
+        const user = new UserWithExcludedOutput();
+        user.name = 'Batman';
+        user.email = 'noreply@batman.example.com';
+
+        const output = user.toJson();
+        expect(output.value).toBeUndefined();
+    })
 });
