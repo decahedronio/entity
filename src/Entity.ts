@@ -5,7 +5,7 @@ import { StringHelper } from './support/StringHelper';
 
 type CamelToSnake<T extends string> = string extends T ? string :
     T extends `${infer C0}${infer R}` ?
-        `${C0 extends Uppercase<C0> ? "_" : ""}${Lowercase<C0>}${CamelToSnake<R>}` :
+        `${C0 extends "_" ? "" : C0 extends Uppercase<C0> ? "_" : ""}${Lowercase<C0>}${CamelToSnake<R>}` :
         "";
 
 type CamelKeysToSnake<T> = T extends readonly any[] ?
