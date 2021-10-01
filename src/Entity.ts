@@ -3,6 +3,27 @@ import { defaultMetadataStorage } from './support/storage';
 import { TypeMetadata } from './support/metadata/TypeMetadata';
 import { StringHelper } from './support/StringHelper';
 
+type CamelToSnake<T extends string> = string extends T ? string :
+    T extends `${infer C0}${infer R}` ?
+        `${C0 extends Uppercase<C0> ? "_" : ""}${Lowercase<C0>}${CamelToSnake<R>}` :
+        "";
+
+type CamelKeysToSnake<T> = T extends readonly any[] ?
+    { [K in keyof T]: CamelKeysToSnake<T[K]> } :
+    T extends object ? {
+        [K in keyof T as CamelToSnake<Extract<K, string>>]: CamelKeysToSnake<T[K]>
+    } : T;
+
+type EntityPropsOnly<T> = {
+    [K in keyof T as T[K] extends Function ? never : K]: T[K] extends Entity
+        ? EntityPropsOnly<T[K]>
+        : (
+            T[K] extends Entity[]
+                ? EntityPropsOnly<T[K][]>
+                : T[K]
+        );
+}
+
 export class Entity {
 
     private static async jsonParseAsync<T extends {[key: string]: any}>(sourceObject: T, jsonObject: any): Promise<T> {
@@ -15,13 +36,8 @@ export class Entity {
         return obj;
     }
 
-    /**
+    /*
      * Parse a generic object into an entity object.
-     *
-     * @param sourceObject
-     * @param jsonObject
-     * @param async
-     * @returns {T}
      */
     private static jsonParse<T extends {[key: string]: any}>(sourceObject: T, jsonObject: any, async = false): T {
         for (let key in jsonObject) {
@@ -79,35 +95,30 @@ export class Entity {
         return sourceObject;
     }
 
-    /**
+    /*
      * Convert JSON data to an Entity instance.
-     *
-     * @param jsonData
-     * @returns {any}
      */
-    fromJson(jsonData: any): any {
-        return Entity.jsonParse(this, jsonData);
+    fromJson(jsonData: Partial<CamelKeysToSnake<EntityPropsOnly<this>>>): void {
+        Entity.jsonParse(this, jsonData);
     }
 
-
-    /**
+    /*
      * Convert JSON data to an Entity instance that has async types.
-     *
-     * @param jsonData
-     * @returns {any}
      */
-    fromJsonAsync(jsonData: any): Promise<any> {
-        return Entity.jsonParseAsync(this, jsonData);
+    async fromJsonAsync(jsonData: any): Promise<void> {
+        await Entity.jsonParseAsync(this, jsonData);
     }
 
+    toJson(toSnake?: true, asString?: false): CamelKeysToSnake<EntityPropsOnly<this>>;
+    toJson(toSnake?: false, asString?: false): EntityPropsOnly<this>;
+    toJson(toSnake?: boolean, asString?: false): EntityPropsOnly<this> | CamelKeysToSnake<EntityPropsOnly<this>>;
+    toJson(toSnake?: boolean, asString?: true): string;
+    toJson(toSnake?: boolean, asString?: boolean): EntityPropsOnly<this> | CamelKeysToSnake<EntityPropsOnly<this>> | string;
 
-    /**
+    /*
      * Convert an Entity to JSON, either in object or string format.
-     * @param {boolean} toSnake
-     * @param {boolean} asString
-     * @returns {any}
      */
-    toJson(toSnake: boolean = true, asString: boolean = false): any {
+    toJson(toSnake: boolean = true, asString: boolean = false): EntityPropsOnly<this> | CamelKeysToSnake<EntityPropsOnly<this>> | string {
         const data: any = {};
 
         for (let key in this) {
@@ -125,7 +136,7 @@ export class Entity {
             const value: any = this[key];
 
             if (value instanceof Entity) {
-                data[outputKey] = value.toJson(toSnake, asString);
+                data[outputKey] = value.toJson(toSnake, asString) as EntityPropsOnly<typeof value>;
 
                 continue;
             }
@@ -134,7 +145,7 @@ export class Entity {
 
             if (value instanceof Array && value.length > 0 && value[0] instanceof Object) {
                 if (value[0] instanceof Entity) {
-                    data[outputKey] = value.map((entity: Entity) => entity.toJson(toSnake, asString));
+                    data[outputKey] = value.map((entity: Entity) => entity.toJson(toSnake, asString)) as EntityPropsOnly<typeof value>;
                 }
 
                 if (metadata && metadata.type === Object) {
