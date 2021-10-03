@@ -47,7 +47,8 @@ export class Entity {
 
             let value = data[key] as any;
 
-            const metadata: TypeMetadata = defaultMetadataStorage.findTypeMetadata(entity.constructor, key);
+            const metadata: TypeMetadata = defaultMetadataStorage.findTypeMetadata(entity.constructor, key)
+                || defaultMetadataStorage.findTypeMetadata(entity.constructor, StringHelper.toCamel(key));
 
             // We shouldn't copy objects to our entity, as the entity
             // should be responsible for constructing these itself.
@@ -96,18 +97,10 @@ export class Entity {
     }
 
     private getProp(key: string) {
-        if (!this.hasOwnProperty(key)) {
-            return;
-        }
-
         return (this as any)[key];
     }
 
     private setProp(key: string, value: any) {
-        if (!this.hasOwnProperty(key)) {
-            return;
-        }
-
         (this as any)[key] = value;
     }
 
