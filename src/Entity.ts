@@ -47,8 +47,7 @@ export class Entity {
 
             let value = data[key] as any;
 
-            const metadata: TypeMetadata = defaultMetadataStorage.findTypeMetadata(entity.constructor, key)
-                || defaultMetadataStorage.findTypeMetadata(entity.constructor, StringHelper.toCamel(key));
+            const metadata: TypeMetadata = defaultMetadataStorage.findTypeMetadata(entity.constructor, key);
 
             // We shouldn't copy objects to our entity, as the entity
             // should be responsible for constructing these itself.
@@ -85,7 +84,7 @@ export class Entity {
                 continue;
             }
             const newKey = EntityBuilder.enableCamelConversion ? StringHelper.toCamel(key) : key;
-            if (entity.hasOwnProperty(newKey)) {
+            if (newKey in entity) {
                 entity.setProp(newKey, value);
             }
             const defaultValueCallback = defaultMetadataStorage.findCallback(entity.constructor, newKey);
@@ -96,11 +95,33 @@ export class Entity {
         return entity as T;
     }
 
-    private getProp(key: string) {
+    hasProp(key: string): boolean {
+        if (key in this) {
+            return true;
+        }
+
+        const metadata = defaultMetadataStorage.findTypeMetadata(this.constructor, key);
+
+        if (metadata) {
+            return true;
+        }
+
+        return false;
+    }
+
+    getProp(key: string) {
+        if (!this.hasProp(key)) {
+            return;
+        }
+
         return (this as any)[key];
     }
 
-    private setProp(key: string, value: any) {
+    setProp(key: string, value: any) {
+        if (!this.hasProp(key)) {
+            return;
+        }
+
         (this as any)[key] = value;
     }
 

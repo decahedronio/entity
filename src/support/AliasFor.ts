@@ -1,16 +1,20 @@
 import { Entity } from '../Entity';
-import { EntityBuilder } from '../EntityBuilder';
-import { StringHelper } from './StringHelper';
-import { TypeMetadata } from './metadata/TypeMetadata';
-import { defaultMetadataStorage } from './storage';
 
 export function AliasFor(key?: string) {
     return function (target: Entity, jsonKey: string) {
-        jsonKey = jsonKey ? jsonKey : (
-            EntityBuilder.enableCamelConversion ? StringHelper.toSnake(key) : key
-        );
+        Object.defineProperty(target, key, {
+            enumerable: true,
+            writable: true,
+        });
 
-        const metadata = new TypeMetadata(target.constructor, key, jsonKey, (value: any) => value);
-        defaultMetadataStorage.addTypeMetadata(metadata);
+        Object.defineProperty(target, jsonKey, {
+            get() {
+                return target.getProp(key);
+            },
+            set(value: any) {
+                target.setProp(key, value);
+            },
+            enumerable: true,
+        });
     };
 }
