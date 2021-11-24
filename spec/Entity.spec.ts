@@ -3,6 +3,7 @@ import {Type} from '../src/support/Type';
 import { EntityBuilder } from "../src/EntityBuilder";
 import {Default} from "../src/support/Default";
 import {JsonExclude} from '../src/support/JsonExclude';
+import { AliasFor } from '../src/support/AliasFor';
 
 class User extends Entity {
     public name: string = null;
@@ -43,7 +44,8 @@ class UserWithAnnotatedPosts extends User {
 }
 
 class UserWithAliasedPrimitive extends User {
-    @Type(String, 'second_name')
+    @AliasFor('middleName')
+    public secondName: string;
     public middleName: string;
 }
 
