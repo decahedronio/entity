@@ -100,13 +100,7 @@ export class Entity {
             return true;
         }
 
-        const metadata = defaultMetadataStorage.findTypeMetadata(this.constructor, key);
-
-        if (metadata) {
-            return true;
-        }
-
-        return false;
+        return !!defaultMetadataStorage.findTypeMetadata(this.constructor, key);
     }
 
     getProp(key: string) {
