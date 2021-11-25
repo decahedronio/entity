@@ -30,6 +30,8 @@ class UserWithDeferredObjectOfNestedEntity extends Entity {
 }
 
 class UserWithFaultyDeferredObjectOfNestedEntity extends Entity {
+    // This is ignored because it's a deliberately wrong type. It will be tested to assert that it does _not_ work.
+    // @ts-ignore
     @Type(() => ({ Address }))
     public address: Address;
 }

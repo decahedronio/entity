@@ -2,6 +2,7 @@ import { EntityBuilder } from './EntityBuilder';
 import { defaultMetadataStorage } from './support/storage';
 import { TypeMetadata } from './support/metadata/TypeMetadata';
 import { StringHelper } from './support/StringHelper';
+import { Buildable } from './support/Type';
 
 type CamelToSnake<T extends string> = string extends T ? string :
     T extends `${infer C0}${infer R}` ?
@@ -56,8 +57,8 @@ export class Entity {
                     entity.setProp(
                         metadata.propertyName,
                         async
-                            ? EntityBuilder.buildOneAsync(metadata.type, value)
-                            : EntityBuilder.buildOne(metadata.type, value)
+                            ? EntityBuilder.buildOneAsync(metadata.type as Promise<Buildable>, value)
+                            : EntityBuilder.buildOne(metadata.type as Buildable, value)
                     );
                 }
                 continue;
@@ -70,8 +71,8 @@ export class Entity {
                     entity.setProp(
                         metadata.propertyName,
                         async
-                            ? EntityBuilder.buildManyAsync(metadata.type, value)
-                            : EntityBuilder.buildMany(metadata.type, value)
+                            ? EntityBuilder.buildManyAsync(metadata.type as Promise<Buildable>, value)
+                            : EntityBuilder.buildMany(metadata.type as Buildable, value)
                     );
                 }
                 continue;
@@ -92,7 +93,8 @@ export class Entity {
                 entity.setProp(newKey, defaultValueCallback.callback());
             }
         }
-        return entity as T;
+
+        return entity;
     }
 
     hasProp(key: string): boolean {
