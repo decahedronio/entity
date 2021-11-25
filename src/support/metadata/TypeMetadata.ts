@@ -7,14 +7,12 @@ import {
 } from '../Type';
 import { Entity } from '../../Entity';
 
-function isResolverFunction(type: Typeable): type is BuildableResolver;
-function isResolverFunction(type: Typeable): boolean {
+function isResolverFunction(type: Typeable): type is BuildableResolver {
     // If the object's name is empty, we will assume it's an anonymous function that resolves the actual type.
     return ((type as unknown as Function).name?.length === 0);
 }
 
-function isAsyncResolver(type: ReturnType<BuildableResolver>): type is ReturnType<BuildableResolverAsync>;
-function isAsyncResolver(type: ReturnType<BuildableResolver>): boolean {
+function isAsyncResolver(type: ReturnType<BuildableResolver>): type is ReturnType<BuildableResolverAsync> {
     // If there is a `then` method in type, it's a Promise, thus a BuildableResolverAsync.
     return typeof (type as Promise<Buildable>).then === 'function';
 }
