@@ -51,7 +51,7 @@ export class Entity {
 
             // We shouldn't copy objects to our entity, as the entity
             // should be responsible for constructing these itself.
-            if (value !== null && typeof value === 'object' && !(value instanceof Array)) {
+            if (value !== null && typeof value === 'object' && !(Array.isArray(value))) {
                 if (metadata) {
                     entity.setProp(
                         metadata.propertyName,
@@ -65,7 +65,7 @@ export class Entity {
             // if we have an array, we check if it contains objects,
             // in which case the entity itself should be assumed
             // responsible to construct the array of entities.
-            if (value instanceof Array && value.length > 0 && typeof value[0] === 'object') {
+            if (Array.isArray(value) && value.length > 0 && typeof value[0] === 'object') {
                 if (metadata) {
                     entity.setProp(
                         metadata.propertyName,
@@ -167,7 +167,7 @@ export class Entity {
 
             const metadata: TypeMetadata = defaultMetadataStorage.findTypeMetadata(this.constructor, key);
 
-            if (value instanceof Array && value.length > 0 && value[0] instanceof Object) {
+            if (Array.isArray(value) && value.length > 0 && value[0] instanceof Object) {
                 if (value[0] instanceof Entity) {
                     data[outputKey] = value.map((entity: Entity) => entity.toJson(toSnake, asString)) as EntityPropsOnly<typeof value>;
                 }
@@ -181,7 +181,7 @@ export class Entity {
 
             // If the key has been manually annotated as an object,
             // we will simply output the object itself.
-            if (value !== null && typeof value === 'object' && !(value instanceof Array)) {
+            if (value !== null && typeof value === 'object' && !(Array.isArray(value))) {
                 if (metadata && metadata.type === Object) {
                     data[outputKey] = value;
                 }
