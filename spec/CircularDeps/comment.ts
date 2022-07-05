@@ -2,7 +2,7 @@ import { Entity } from '../../src/Entity';
 import { Type } from '../../src/support/Type';
 import { BlogPost, BlogPostAsync } from './blog';
 
-export class Comment extends Entity {
+export default class Comment extends Entity {
     public body: string = null;
 
     @Type(() => require('./blog').BlogPost)

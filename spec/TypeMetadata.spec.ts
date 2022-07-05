@@ -15,7 +15,7 @@ class UserWithRegularNestedEntity extends Entity {
 }
 
 class UserWithRegularAsyncNestedEntity extends Entity {
-    @Type(async () => await Address)
+    @Type(async () => Address)
     public address: Address;
 }
 

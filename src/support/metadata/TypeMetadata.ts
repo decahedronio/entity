@@ -14,7 +14,7 @@ function isResolverFunction(type: Typeable): type is BuildableResolver {
 
 function isAsyncResolver(type: ReturnType<BuildableResolver>): type is ReturnType<BuildableResolverAsync> {
     // If there is a `then` method in type, it's a Promise, thus a BuildableResolverAsync.
-    return typeof (type as Promise<Buildable>).then === 'function';
+    return typeof (type as Promise<Buildable>)?.then === 'function';
 }
 
 export class TypeMetadata {
