@@ -6,7 +6,7 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc",
-    "test": "jasmine"
+    "test": "jest"
   },
   "repository": {
     "type": "git",
