@@ -2,12 +2,20 @@ import { defaultMetadataStorage } from './support/storage';
 import { TypeMetadata } from './support/metadata/TypeMetadata';
 import { StringHelper } from './support/StringHelper';
 
+/**
+ * This type converts given string's camelCase parts to snake_case.
+ */
 type Snake<T extends string> =
     string extends T ? string :
         T extends `${infer C0}${infer R}`
             ? `${C0 extends "_" ? "" : C0 extends Uppercase<C0> ? "_" : ""}${Lowercase<C0>}${Snake<R>}`
             : "";
 
+/**
+ * This generic type returns a new type from the given entity class that only
+ * includes the data properties of the entity. It will not
+ * include any methods of the entity.
+ */
 export type Props<T extends Entity> = {
     [K in keyof T as T[K] extends Function ? never : Extract<K, string>]:
         T[K] extends Entity[] ? Props<T[K][number]>[] :
@@ -15,6 +23,12 @@ export type Props<T extends Entity> = {
                 T[K]
 }
 
+/**
+ * The only difference this type has from `Props<T>` is that the property keys
+ * will be snake_cased to be inline with how this library converts property
+ * keys while building entities from plain objects, and while converting
+ * entities to plain objects.
+ */
 export type PropsJson<T extends Entity> = {
     [K in keyof T as T[K] extends Function ? never : Snake<Extract<K, string>>]:
         T[K] extends Entity[] ? PropsJson<T[K][number]>[] :
@@ -22,6 +36,12 @@ export type PropsJson<T extends Entity> = {
                 T[K]
 }
 
+/**
+ * The reason this type exists instead of just doing `Partial<Props<T>>` is
+ * because the partiality is recursive. `Partial<Props<T>>` and
+ * `PartialProps<T>` will generate different result
+ * for entities that have Entity props.
+ */
 export type PartialProps<T extends Entity> = Partial<{
     [K in keyof T as T[K] extends Function ? never : Extract<K, string>]:
         T[K] extends Entity[] ? PartialProps<T[K][number]>[] :
@@ -29,6 +49,11 @@ export type PartialProps<T extends Entity> = Partial<{
                 T[K]
 }>
 
+/**
+ * Similar to differences between `Props<T>` and `PropsJson<T>`, the only
+ * difference between this type and `PartialProps<T>` is that this
+ * type will convert property keys to snake case.
+ */
 export type PartialPropsJson<T extends Entity> = Partial<{
     [K in keyof T as T[K] extends Function ? never : Snake<Extract<K, string>>]:
         T[K] extends Entity[] ? PartialPropsJson<T[K][number]>[] :
