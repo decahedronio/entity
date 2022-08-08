@@ -26,7 +26,7 @@ export class EntityBuilder {
 
     private static fill<T extends Entity>(entity: T, data: PartialPropsJson<T>): T {
         for (let key in data) {
-            EntityBuilder.fillProperty<T>(entity, StringHelper.toCamel(key), data[key]);
+            EntityBuilder.fillProperty<T>(entity, key, data[key]);
         }
 
         return entity;
@@ -41,7 +41,7 @@ export class EntityBuilder {
         }
 
         // No type definition means scalar value, and we can just set that as is.
-        entity.setProp(key, value);
+        entity.setProp(StringHelper.toCamel(key), value);
     }
 
     private static fillTypeDecoratedProperty<T extends Entity>(entity: T, metadata: TypeMetadata, value: InstanceType<Buildable>) {

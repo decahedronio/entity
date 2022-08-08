@@ -45,6 +45,11 @@ class UserWithExcludedOutput extends User {
     public value: string = 'test';
 }
 
+class UserWithAliasedPrimitive extends User {
+    @Type(String, 'second_name')
+    public middleName: string;
+}
+
 describe('EntityBuilder', () => {
     it('can decode a json payload into an entity', async () => {
         const user = EntityBuilder.buildOne(User, {
@@ -126,6 +131,17 @@ describe('EntityBuilder', () => {
 
         expect(user.posts).toBeDefined();
         expect(user.posts).toEqual([]);
+    });
+
+    it('interprets an annotated primitive as an alias', () => {
+        const user = EntityBuilder.buildOne(UserWithAliasedPrimitive, {
+            name: 'Decahedron Technologies Ltd',
+            email: 'hello@decahedron.io',
+            days_available: ['Monday', 'Wednesday', 'Friday'],
+            second_name: 'A Middle Name',
+        });
+
+        expect(user.middleName).toEqual('A Middle Name');
     });
 
     it('can decode an annotated Object, without being an entity', async () => {
