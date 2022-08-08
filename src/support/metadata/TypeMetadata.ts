@@ -2,40 +2,31 @@ import {
     PackedBuildable,
     Buildable,
     BuildableResolver,
-    BuildableResolverAsync,
     Typeable,
+    Constructor,
 } from '../Type';
 import { Entity } from '../../Entity';
 
 function isResolverFunction(type: Typeable): type is BuildableResolver {
     // If the object's name is empty, we will assume it's an anonymous function that resolves the actual type.
-    return ((type as unknown as Function).name?.length === 0);
-}
-
-function isAsyncResolver(type: ReturnType<BuildableResolver>): type is ReturnType<BuildableResolverAsync> {
-    // If there is a `then` method in type, it's a Promise, thus a BuildableResolverAsync.
-    return typeof (type as Promise<Buildable>)?.then === 'function';
+    return type.name?.length === 0;
 }
 
 export class TypeMetadata {
     constructor(
-        public target: typeof Entity,
+        public target: Constructor<Entity>,
         public propertyName: string,
         public sourcePropertyName: string,
         private _type: Typeable
     ) {}
 
-    public get type(): Buildable | Promise<Buildable>
+    public get type(): Buildable
     {
         if (isResolverFunction(this._type)) {
             // Run the function to actually import the module and assign the module
             // to type prop so that the EntityBuilder will actually get an entity
             // constructor, and not a resolver function.
             const resolvedType = (this._type)();
-
-            if (isAsyncResolver(resolvedType)) {
-                return TypeMetadata.unpackTypeAsync(resolvedType);
-            }
 
             return TypeMetadata.unpackType(resolvedType);
         }
@@ -58,9 +49,5 @@ export class TypeMetadata {
         }
 
         return type;
-    }
-
-    private static async unpackTypeAsync(type: Promise<PackedBuildable>): Promise<Buildable> {
-         return TypeMetadata.unpackType(await type);
     }
 }

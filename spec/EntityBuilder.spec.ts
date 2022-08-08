@@ -47,13 +47,11 @@ class UserWithExcludedOutput extends User {
 
 describe('EntityBuilder', () => {
     it('can decode a json payload into an entity', async () => {
-        const user = await EntityBuilder.buildOne(User, {
+        const user = EntityBuilder.buildOne(User, {
             name: 'Decahedron Technologies Ltd.',
             email: 'hello@decahedron.io',
             days_available: ['Monday', 'Wednesday', 'Friday'],
         });
-
-        console.log(user);
 
         expect(user.name).toEqual('Decahedron Technologies Ltd.');
         expect(user.email).toEqual('hello@decahedron.io');
@@ -61,7 +59,7 @@ describe('EntityBuilder', () => {
     });
 
     it('decodes a non-annotated nested object as POJO', async () => {
-        const user = await EntityBuilder.buildOne(UserWithAddress, {
+        const user = EntityBuilder.buildOne(UserWithAddress, {
             name: 'Decahedron Technologies Ltd.',
             email: 'hello@decahedron.io',
             days_available: ['Monday', 'Wednesday', 'Friday'],
@@ -82,7 +80,7 @@ describe('EntityBuilder', () => {
     });
 
     it('decodes an annotated nested object', async () => {
-        const user = await EntityBuilder.buildOne(UserWithAnnotatedAddress, {
+        const user = EntityBuilder.buildOne(UserWithAnnotatedAddress, {
             name: 'Decahedron Technologies Ltd.',
             email: 'hello@decahedron.io',
             days_available: ['Monday', 'Wednesday', 'Friday'],
@@ -102,7 +100,7 @@ describe('EntityBuilder', () => {
     });
 
     it('decodes an annotated optional nested array object', async () => {
-        const user = await EntityBuilder.buildOne(UserWithAnnotatedPosts, {
+        const user = EntityBuilder.buildOne(UserWithAnnotatedPosts, {
             name: 'Decahedron Technologies Ltd.',
             email: 'hello@decahedron.io',
             days_available: ['Monday', 'Wednesday', 'Friday'],
@@ -119,7 +117,7 @@ describe('EntityBuilder', () => {
     });
 
     it('decodes an annotated optional nested array object to empty array', async () => {
-        const user = await EntityBuilder.buildOne(UserWithAnnotatedPosts, {
+        const user = EntityBuilder.buildOne(UserWithAnnotatedPosts, {
             name: 'Decahedron Technologies Ltd.',
             email: 'hello@decahedron.io',
             days_available: ['Monday', 'Wednesday', 'Friday'],
@@ -131,7 +129,7 @@ describe('EntityBuilder', () => {
     });
 
     it('can decode an annotated Object, without being an entity', async () => {
-        const user = await EntityBuilder.buildOne(UserWithAnnotatedObject, {
+        const user = EntityBuilder.buildOne(UserWithAnnotatedObject, {
             name: 'Decahedron Technologies Ltd',
             email: 'hello@decahedron.io',
             days_available: ['Monday', 'Wednesday', 'Friday'],
@@ -151,7 +149,7 @@ describe('EntityBuilder', () => {
     });
 
     it('can encode itself to a plain object', async () => {
-        const user = await EntityBuilder.buildOne(User, {
+        const user = EntityBuilder.buildOne(User, {
             name: 'Decahedron Technologies Ltd.',
             email: 'hello@decahedron.io',
             days_available: ['Monday', 'Wednesday', 'Friday'],
@@ -166,7 +164,7 @@ describe('EntityBuilder', () => {
     });
 
     it('can encode itself to a plain object while maintaining camelCase', async () => {
-        const user = await EntityBuilder.buildOne(User, {
+        const user = EntityBuilder.buildOne(User, {
             name: 'Decahedron Technologies Ltd.',
             email: 'hello@decahedron.io',
             days_available: ['Monday', 'Wednesday', 'Friday'],
@@ -181,7 +179,7 @@ describe('EntityBuilder', () => {
     });
 
     it('can encode itself to a plain object and convert to a json string', async () => {
-        const user = await EntityBuilder.buildOne(User, {
+        const user = EntityBuilder.buildOne(User, {
             name: 'Decahedron Technologies Ltd.',
             email: 'hello@decahedron.io',
             days_available: ['Monday', 'Wednesday', 'Friday'],
@@ -196,7 +194,7 @@ describe('EntityBuilder', () => {
     });
 
     it('can encode itself to a plain object and convert to a json string without converting to snake case', async () => {
-        const user = await EntityBuilder.buildOne(User, {
+        const user = EntityBuilder.buildOne(User, {
             name: 'Decahedron Technologies Ltd.',
             email: 'hello@decahedron.io',
             days_available: ['Monday', 'Wednesday', 'Friday'],
@@ -211,7 +209,7 @@ describe('EntityBuilder', () => {
     });
 
     it('can encode itself and its children to a plain object', async () => {
-        const user = await EntityBuilder.buildOne(UserWithAnnotatedAddress, {
+        const user = EntityBuilder.buildOne(UserWithAnnotatedAddress, {
             name: 'Decahedron Technologies Ltd.',
             email: 'hello@decahedron.io',
             days_available: ['Monday', 'Wednesday', 'Friday'],
@@ -238,7 +236,7 @@ describe('EntityBuilder', () => {
     });
 
     it('can encode itself and its array children to a plain object', async () => {
-        const user = await EntityBuilder.buildOne(UserWithAnnotatedPosts, {
+        const user = EntityBuilder.buildOne(UserWithAnnotatedPosts, {
             name: 'Decahedron Technologies Ltd.',
             email: 'hello@decahedron.io',
             days_available: ['Monday', 'Wednesday', 'Friday'],
@@ -261,7 +259,7 @@ describe('EntityBuilder', () => {
     });
 
     it('should preserve null values for annotated attributes', async () => {
-        const user = await EntityBuilder.buildOne(UserWithAnnotatedAddress, {
+        const user = EntityBuilder.buildOne(UserWithAnnotatedAddress, {
             name: 'Decahedron Technologies Ltd.',
             email: 'hello@decahedron.io',
             days_available: ['Monday', 'Wednesday', 'Friday'],
@@ -278,7 +276,7 @@ describe('EntityBuilder', () => {
     });
 
     it('should preserve null values for non-annotated attributes', async () => {
-        const user = await EntityBuilder.buildOne(UserWithAnnotatedAddress, {
+        const user = EntityBuilder.buildOne(UserWithAnnotatedAddress, {
             name: 'Decahedron Technologies Ltd.',
             email: null,
             days_available: ['Monday', 'Wednesday', 'Friday'],

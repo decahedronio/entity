@@ -1,5 +1,4 @@
 import { defaultMetadataStorage } from './storage';
-import { EntityBuilder } from '../EntityBuilder';
 import { StringHelper } from './StringHelper';
 import { TypeMetadata } from './metadata/TypeMetadata';
 import { Entity } from '../Entity';
@@ -11,20 +10,16 @@ export type Buildable = Constructor<Entity> | typeof Object | typeof String | ty
 export type DefaultExportedBuildable = { default: Buildable };
 export type PackedBuildable = Buildable | DefaultExportedBuildable;
 
-export type BuildableResolverSync = () => PackedBuildable;
-export type BuildableResolverAsync = () => Promise<PackedBuildable>;
-export type BuildableResolver = BuildableResolverAsync | BuildableResolverSync;
+export type BuildableResolver = () => PackedBuildable;
 
 // Types that can be passed to @Type decorator factory.
 export type Typeable = Buildable | BuildableResolver;
 
 export function Type<T extends Typeable>(type: T, jsonKey?: string) {
     return function (target: Entity, key: string) {
-        jsonKey = jsonKey ? jsonKey : (
-            EntityBuilder.enableCamelConversion ? StringHelper.toSnake(key) : key
-        );
+        jsonKey = jsonKey ?? StringHelper.toSnake(key);
 
-        const metadata = new TypeMetadata(target.constructor as typeof Entity, key, jsonKey, type);
+        const metadata = new TypeMetadata(target.constructor as Constructor<Entity>, key, jsonKey, type);
         defaultMetadataStorage.addTypeMetadata(metadata);
     };
 }
