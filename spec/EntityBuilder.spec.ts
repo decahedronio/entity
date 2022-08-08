@@ -50,6 +50,10 @@ class UserWithAliasedPrimitive extends User {
     public middleName: string;
 }
 
+class UserWithDefaultValue extends User {
+    public company: string = 'Jobilla Oy';
+}
+
 describe('EntityBuilder', () => {
     it('can decode a json payload into an entity', async () => {
         const user = EntityBuilder.buildOne(User, {
@@ -142,6 +146,49 @@ describe('EntityBuilder', () => {
         });
 
         expect(user.middleName).toEqual('A Middle Name');
+    });
+
+    it('persists default value if nothing is provided for a property', () => {
+        const user = EntityBuilder.buildOne(UserWithDefaultValue, {
+            name: 'Decahedron Technologies Ltd',
+        });
+
+        expect(user.company).toEqual('Jobilla Oy');
+
+        const userWithExplicitUndefined = EntityBuilder.buildOne(UserWithDefaultValue, {
+            name: 'Decahedron Technologies Ltd',
+            company: undefined,
+        });
+
+        expect(user.company).toEqual('Jobilla Oy');
+        expect(userWithExplicitUndefined.company).toEqual('Jobilla Oy');
+    });
+
+    it('does not persist default value if null is provided for a property', () => {
+        const user = EntityBuilder.buildOne(UserWithDefaultValue, {
+            name: 'Decahedron Technologies Ltd',
+            company: null,
+        });
+
+        expect(user.company).toEqual(null);
+    });
+
+    it('does not persist default value if non-null value is provided for a property', () => {
+        let user;
+
+        user = EntityBuilder.buildOne(UserWithDefaultValue, {
+            name: 'Decahedron Technologies Ltd',
+            company: '',
+        });
+
+        expect(user.company).not.toEqual('Jobilla Oy');
+
+        user = EntityBuilder.buildOne(UserWithDefaultValue, {
+            name: 'Decahedron Technologies Ltd',
+            company: 'Not Jobilla Ayy!',
+        });
+
+        expect(user.company).not.toEqual('Jobilla Oy');
     });
 
     it('can decode an annotated Object, without being an entity', async () => {

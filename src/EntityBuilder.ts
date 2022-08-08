@@ -33,9 +33,14 @@ export class EntityBuilder {
     }
 
     private static fillProperty<T extends Entity>(entity: T, key: string, value: any): void {
+        // Don't even bother for undefined values.
+        if (typeof value === 'undefined') {
+            return;
+        }
+
         const metadata: TypeMetadata = defaultMetadataStorage.findTypeMetadata(entity.constructor, key);
 
-        if (metadata && (value !== null && typeof value !== 'undefined')) {
+        if (metadata) {
             EntityBuilder.fillTypeDecoratedProperty<T>(entity, metadata, value);
             return;
         }
@@ -46,7 +51,7 @@ export class EntityBuilder {
 
     private static fillTypeDecoratedProperty<T extends Entity>(entity: T, metadata: TypeMetadata, value: InstanceType<Buildable>) {
         // We shouldn't copy objects to our entity, as the entity should be responsible for constructing these itself.
-        if (typeof value === 'object' && !Array.isArray(value)) {
+        if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
             if (isEntityType(metadata.type)) {
                 entity.setProp(metadata.propertyName, EntityBuilder.buildOne(metadata.type, value));
             } else {
