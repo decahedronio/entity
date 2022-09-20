@@ -65,7 +65,7 @@ export class Entity {
     [key: string]: any;
 
     hasProp(key: string): boolean {
-        if (key in this) {
+        if (Object.hasOwn(this.constructor, key) || Object.hasOwn(this, key)) {
             return true;
         }
 
