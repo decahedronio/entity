@@ -1,102 +1,71 @@
-import { EntityBuilder } from './EntityBuilder';
 import { defaultMetadataStorage } from './support/storage';
 import { TypeMetadata } from './support/metadata/TypeMetadata';
 import { StringHelper } from './support/StringHelper';
 
-type CamelToSnake<T extends string> = string extends T ? string :
-    T extends `${infer C0}${infer R}` ?
-        `${C0 extends "_" ? "" : C0 extends Uppercase<C0> ? "_" : ""}${Lowercase<C0>}${CamelToSnake<R>}` :
-        "";
+/**
+ * This type converts given string's camelCase parts to snake_case.
+ */
+type Snake<T extends string> =
+    string extends T ? string :
+        T extends `${infer C0}${infer R}`
+            ? `${C0 extends "_" ? "" : C0 extends Uppercase<C0> ? "_" : ""}${Lowercase<C0>}${Snake<R>}`
+            : "";
 
-type CamelKeysToSnake<T> = T extends readonly any[] ?
-    { [K in keyof T]: CamelKeysToSnake<T[K]> } :
-    T extends object ? {
-        [K in keyof T as CamelToSnake<Extract<K, string>>]: CamelKeysToSnake<T[K]>
-    } : T;
-
-type EntityPropsOnly<T> = {
-    [K in keyof T as T[K] extends Function ? never : K]: T[K] extends Entity
-        ? EntityPropsOnly<T[K]>
-        : (
-            T[K] extends Entity[]
-                ? EntityPropsOnly<T[K][]>
-                : T[K]
-        );
+/**
+ * This generic type returns a new type from the given entity class that only
+ * includes the data properties of the entity. It will not
+ * include any methods of the entity.
+ */
+export type Props<T extends Entity> = {
+    [K in keyof T as T[K] extends Function ? never : Extract<K, string>]:
+        T[K] extends Entity[] ? Props<T[K][number]>[] :
+            T[K] extends Entity ? Props<T[K]> :
+                T[K]
 }
 
+/**
+ * The only difference this type has from `Props<T>` is that the property keys
+ * will be snake_cased to be inline with how this library converts property
+ * keys while building entities from plain objects, and while converting
+ * entities to plain objects.
+ */
+export type PropsJson<T extends Entity> = {
+    [K in keyof T as T[K] extends Function ? never : Snake<Extract<K, string>>]:
+        T[K] extends Entity[] ? PropsJson<T[K][number]>[] :
+            T[K] extends Entity ? PropsJson<T[K]> :
+                T[K]
+}
+
+/**
+ * The reason this type exists instead of just doing `Partial<Props<T>>` is
+ * because the partiality is recursive. `Partial<Props<T>>` and
+ * `PartialProps<T>` will generate different result
+ * for entities that have Entity props.
+ */
+export type PartialProps<T extends Entity> = Partial<{
+    [K in keyof T as T[K] extends Function ? never : Extract<K, string>]:
+        T[K] extends Entity[] ? PartialProps<T[K][number]>[] :
+            T[K] extends Entity ? PartialProps<T[K]> :
+                T[K]
+}>
+
+/**
+ * Similar to differences between `Props<T>` and `PropsJson<T>`, the only
+ * difference between this type and `PartialProps<T>` is that this
+ * type will convert property keys to snake case.
+ */
+export type PartialPropsJson<T extends Entity> = Partial<{
+    [K in keyof T as T[K] extends Function ? never : Snake<Extract<K, string>>]:
+        T[K] extends Entity[] ? PartialPropsJson<T[K][number]>[] :
+            T[K] extends Entity ? PartialPropsJson<T[K]> :
+                T[K]
+}>
+
 export class Entity {
-
-    private static async jsonParseAsync<T extends Entity>(sourceObject: T, jsonObject: Partial<CamelKeysToSnake<EntityPropsOnly<T>>>): Promise<T> {
-        const obj = Entity.jsonParse<T>(sourceObject, jsonObject, true);
-        for (const key in obj) {
-            if (obj.hasOwnProperty(key)) {
-                obj[key] = await obj[key];
-            }
-        }
-        return obj;
-    }
-
-    /*
-     * Parse a generic object into an entity object.
-     */
-    private static jsonParse<T extends Entity>(entity: T, data: Partial<CamelKeysToSnake<EntityPropsOnly<T>>>, async = false): T {
-        for (let key in data) {
-            if (!data.hasOwnProperty(key)) {
-                continue;
-            }
-
-            let value = data[key] as any;
-
-            const metadata: TypeMetadata = defaultMetadataStorage.findTypeMetadata(entity.constructor, key);
-
-            // We shouldn't copy objects to our entity, as the entity
-            // should be responsible for constructing these itself.
-            if (value !== null && typeof value === 'object' && !(Array.isArray(value))) {
-                if (metadata) {
-                    entity.setProp(
-                        metadata.propertyName,
-                        async
-                            ? EntityBuilder.buildOneAsync(metadata.type, value)
-                            : EntityBuilder.buildOne(metadata.type, value)
-                    );
-                }
-                continue;
-            }
-            // if we have an array, we check if it contains objects,
-            // in which case the entity itself should be assumed
-            // responsible to construct the array of entities.
-            if (Array.isArray(value) && value.length > 0 && typeof value[0] === 'object') {
-                if (metadata) {
-                    entity.setProp(
-                        metadata.propertyName,
-                        async
-                            ? EntityBuilder.buildManyAsync(metadata.type, value)
-                            : EntityBuilder.buildMany(metadata.type, value)
-                    );
-                }
-                continue;
-            }
-            // Since all other scenarios have been exhausted, we're dealing with a primitive of some form.
-            // This can be an empty array of objects too, but since it's empty, there's no need for us
-            // to build an entity. As such, we can just assign it. The same goes for all primitives.
-            if (metadata) {
-                entity.setProp(metadata.propertyName, value);
-                continue;
-            }
-            const newKey = EntityBuilder.enableCamelConversion ? StringHelper.toCamel(key) : key;
-            if (newKey in entity) {
-                entity.setProp(newKey, value);
-            }
-            const defaultValueCallback = defaultMetadataStorage.findCallback(entity.constructor, newKey);
-            if (defaultValueCallback && defaultValueCallback.condition(entity.getProp(newKey))) {
-                entity.setProp(newKey, defaultValueCallback.callback());
-            }
-        }
-        return entity as T;
-    }
+    [key: string]: any;
 
     hasProp(key: string): boolean {
-        if (key in this) {
+        if (Object.prototype.hasOwnProperty.call(this.constructor, key) || Object.prototype.hasOwnProperty.call(this, key)) {
             return true;
         }
 
@@ -108,7 +77,7 @@ export class Entity {
             return;
         }
 
-        return (this as any)[key];
+        return this[key];
     }
 
     setProp(key: string, value: any) {
@@ -116,33 +85,19 @@ export class Entity {
             return;
         }
 
-        (this as any)[key] = value;
+        this[key] = value;
     }
 
-    /*
-     * Convert JSON data to an Entity instance.
-     */
-    fromJson<T extends Entity>(this: T, jsonData: Partial<CamelKeysToSnake<EntityPropsOnly<T>>>): void {
-        Entity.jsonParse<T>(this, jsonData);
-    }
-
-    /*
-     * Convert JSON data to an Entity instance that has async types.
-     */
-    async fromJsonAsync<T extends Entity>(this: T, jsonData: Partial<CamelKeysToSnake<EntityPropsOnly<T>>>): Promise<void> {
-        await Entity.jsonParseAsync<T>(this, jsonData);
-    }
-
-    toJson(toSnake?: true, asString?: false): CamelKeysToSnake<EntityPropsOnly<this>>;
-    toJson(toSnake?: false, asString?: false): EntityPropsOnly<this>;
-    toJson(toSnake?: boolean, asString?: false): EntityPropsOnly<this> | CamelKeysToSnake<EntityPropsOnly<this>>;
+    toJson(toSnake?: true, asString?: false): PropsJson<this>;
+    toJson(toSnake?: false, asString?: false): Props<this>;
+    toJson(toSnake?: boolean, asString?: false): Props<this> | PropsJson<this>;
     toJson(toSnake?: boolean, asString?: true): string;
-    toJson(toSnake?: boolean, asString?: boolean): EntityPropsOnly<this> | CamelKeysToSnake<EntityPropsOnly<this>> | string;
+    toJson(toSnake?: boolean, asString?: boolean): Props<this> | PropsJson<this> | string;
 
     /*
      * Convert an Entity to JSON, either in object or string format.
      */
-    toJson(toSnake: boolean = true, asString: boolean = false): EntityPropsOnly<this> | CamelKeysToSnake<EntityPropsOnly<this>> | string {
+    toJson(toSnake: boolean = true, asString: boolean = false): Props<this> | PropsJson<this> | string {
         const data: any = {};
 
         for (let key in this) {
@@ -160,7 +115,7 @@ export class Entity {
             const value: any = this[key];
 
             if (value instanceof Entity) {
-                data[outputKey] = value.toJson(toSnake, asString) as EntityPropsOnly<typeof value>;
+                data[outputKey] = value.toJson(toSnake, asString) as Props<typeof value>;
 
                 continue;
             }
@@ -169,7 +124,7 @@ export class Entity {
 
             if (Array.isArray(value) && value.length > 0 && value[0] instanceof Object) {
                 if (value[0] instanceof Entity) {
-                    data[outputKey] = value.map((entity: Entity) => entity.toJson(toSnake, asString)) as EntityPropsOnly<typeof value>;
+                    data[outputKey] = value.map((entity: Entity) => entity.toJson(toSnake, asString));
                 }
 
                 if (metadata && metadata.type === Object) {

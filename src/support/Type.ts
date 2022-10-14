@@ -1,16 +1,25 @@
 import { defaultMetadataStorage } from './storage';
-import { EntityBuilder } from '../EntityBuilder';
 import { StringHelper } from './StringHelper';
 import { TypeMetadata } from './metadata/TypeMetadata';
 import { Entity } from '../Entity';
 
-export function Type(type?: Function, jsonKey?: string) {
-    return function (target: Entity, key: string) {
-        jsonKey = jsonKey ? jsonKey : (
-            EntityBuilder.enableCamelConversion ? StringHelper.toSnake(key) : key
-        );
+export type Constructor<T> = { new(...args: any): T };
 
-        const metadata = new TypeMetadata(target.constructor, key, jsonKey, type);
+// Types that can be passed as first argument to `EntityBuilder`.
+export type Buildable = Constructor<Entity> | typeof Object | typeof String | typeof Number | typeof Boolean;
+export type DefaultExportedBuildable = { default: Buildable };
+export type PackedBuildable = Buildable | DefaultExportedBuildable;
+
+export type BuildableResolver = () => PackedBuildable;
+
+// Types that can be passed to @Type decorator factory.
+export type Typeable = Buildable | BuildableResolver;
+
+export function Type<T extends Typeable>(type: T, jsonKey?: string) {
+    return function (target: Entity, key: string) {
+        jsonKey = jsonKey ?? StringHelper.toSnake(key);
+
+        const metadata = new TypeMetadata(target.constructor as Constructor<Entity>, key, jsonKey, type);
         defaultMetadataStorage.addTypeMetadata(metadata);
     };
 }

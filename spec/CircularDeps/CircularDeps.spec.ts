@@ -1,11 +1,10 @@
-import { BlogPost, BlogPostAsync } from './blog';
-import './comment';
+import { BlogPost } from './blog';
+import Comment from './comment';
+import { EntityBuilder } from '../../src/EntityBuilder';
 
 describe('Entity with circular dependency', () => {
-    it('decodes an annotated nested object', () => {
-        const blog = new BlogPost();
-
-        blog.fromJson({
+    it('decodes circularly depended annotated entity', () => {
+        const blog = EntityBuilder.buildOne(BlogPost, {
             title: 'Decahedron/Entity gets circdep',
             body: 'hooray!',
             comments: [
@@ -17,19 +16,17 @@ describe('Entity with circular dependency', () => {
         expect(blog.comments[0]).toBeDefined();
         expect(blog.comments[0].body).toEqual('Yay!');
     });
-    it('decodes an annotated nested object async', async () => {
-        const blog = new BlogPostAsync();
 
-        await blog.fromJsonAsync({
-            title: 'Decahedron/Entity gets circdep',
+    it('decodes circularly depended annotated entity other way around', () => {
+        const comment = EntityBuilder.buildOne(Comment, {
             body: 'hooray!',
-            comments: [
-                { body: 'Yay!' },
-            ],
+            blog: {
+                title: 'Decahedron/Entity gets circdep',
+                body: 'hooray!',
+            },
         });
 
-        expect(blog.comments).toBeDefined();
-        expect(blog.comments[0]).toBeDefined();
-        expect(blog.comments[0].body).toEqual('Yay!');
+        expect(comment.blog).toBeDefined();
+        expect(comment.blog.body).toEqual('hooray!');
     });
 });

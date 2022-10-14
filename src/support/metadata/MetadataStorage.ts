@@ -19,7 +19,6 @@ export class MetadataStorage {
      * @type {Array}
      */
     private typeMetadatas: TypeMetadata[] = [];
-    private defaultCallbacks: DefaultValueCallbackMetadata[] = [];
     private excludedProperties: JsonExcludeMetadata[] = [];
 
     /**
@@ -29,10 +28,6 @@ export class MetadataStorage {
      */
     addTypeMetadata(metadata: TypeMetadata) {
         this.typeMetadatas.push(metadata);
-    }
-
-    addDefaultCallback(callbackMetadata: DefaultValueCallbackMetadata) {
-        this.defaultCallbacks.push(callbackMetadata);
     }
 
     addExcludeProperty(excludeMeta: JsonExcludeMetadata) {
@@ -51,16 +46,15 @@ export class MetadataStorage {
             meta.target === target && meta.sourcePropertyName === propertyName,
         );
 
+        const metadataForAliasedProperty = this.typeMetadatas.find(meta =>
+            meta.target === target && meta.propertyName === propertyName,
+        );
+
         const metadataFromChildren = this.typeMetadatas.find(meta =>
             target.prototype instanceof meta.target && meta.sourcePropertyName === propertyName,
         );
 
-        return metadataFromTarget || metadataFromChildren;
-    }
-
-    findCallback(target: any, propertyName: string): DefaultValueCallbackMetadata|undefined {
-        return this.defaultCallbacks.find(cbmeta => cbmeta.target === target && cbmeta.propertyName === propertyName) ||
-            this.defaultCallbacks.find(cbmeta => target.prototype instanceof cbmeta.target && cbmeta.propertyName === propertyName);
+        return metadataFromTarget || metadataForAliasedProperty || metadataFromChildren;
     }
 
     isPropertyExcluded(target: any, propertyName: string): boolean {

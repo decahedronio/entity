@@ -1,8 +1,8 @@
-import {Type} from '../src/support/Type';
-import {defaultMetadataStorage} from '../src/support/storage';
+import { Type } from '../src/support/Type';
+import { defaultMetadataStorage } from '../src/support/storage';
 import { Entity } from '../src/Entity';
 
-class Decorated {
+class Decorated extends Entity {
 
 }
 

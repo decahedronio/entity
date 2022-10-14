@@ -14,11 +14,6 @@ class UserWithRegularNestedEntity extends Entity {
     public address: Address;
 }
 
-class UserWithRegularAsyncNestedEntity extends Entity {
-    @Type(async () => await Address)
-    public address: Address;
-}
-
 class UserWithDeferredNestedEntity extends Entity {
     @Type(() => Address)
     public address: Address;
@@ -30,6 +25,8 @@ class UserWithDeferredObjectOfNestedEntity extends Entity {
 }
 
 class UserWithFaultyDeferredObjectOfNestedEntity extends Entity {
+    // This is ignored because it's a deliberately wrong type. It will be tested to assert that it does _not_ work.
+    // @ts-ignore
     @Type(() => ({ Address }))
     public address: Address;
 }
@@ -51,15 +48,6 @@ describe('TypeMetadata', () => {
         );
 
         expect(metadata.type).toBe(Address);
-    });
-
-    it('resolves type when an async resolver function is given', async () => {
-        const metadata = defaultMetadataStorage.findTypeMetadata(
-            UserWithRegularAsyncNestedEntity,
-            'address'
-        );
-
-        expect(await metadata.type).toBe(Address);
     });
 
     it('resolves type when a resolver function that returns an object is given', () => {
