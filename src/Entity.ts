@@ -62,10 +62,8 @@ export type PartialPropsJson<T extends Entity> = Partial<{
 }>
 
 export class Entity {
-    [key: string]: any;
-
     hasProp(key: string): boolean {
-        if (Object.prototype.hasOwnProperty.call(this.constructor, key) || Object.prototype.hasOwnProperty.call(this, key)) {
+        if (Object.prototype.hasOwnProperty.call(this, key)) {
             return true;
         }
 
@@ -77,7 +75,7 @@ export class Entity {
             return;
         }
 
-        return this[key];
+        return (this as any)[key];
     }
 
     setProp(key: string, value: any) {
@@ -85,7 +83,7 @@ export class Entity {
             return;
         }
 
-        this[key] = value;
+        (this as any)[key] = value;
     }
 
     toJson(toSnake?: true, asString?: false): PropsJson<this>;
