@@ -5,7 +5,7 @@ build:
 	rm -rf dist/src
 
 test:
-	jest
+	npx jest
 
 publish:
 	npm publish
