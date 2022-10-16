@@ -11,8 +11,7 @@ export class EntityBuilder {
         sourceData: PartialPropsJson<T>,
     ): T {
         const entity = new (buildClass)();
-        EntityBuilder.fill<T>(entity, sourceData);
-        return entity;
+        return entity.fromJson(sourceData);
     }
 
     public static buildMany<T extends Entity>(
@@ -24,7 +23,7 @@ export class EntityBuilder {
         );
     }
 
-    private static fill<T extends Entity>(entity: T, data: PartialPropsJson<T>): T {
+    public static fill<T extends Entity>(entity: T, data: PartialPropsJson<T>): T {
         for (let key in data) {
             EntityBuilder.fillProperty<T>(entity, key, data[key]);
         }

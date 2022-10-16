@@ -100,4 +100,9 @@ export class Entity {
     toJson(toSnake: boolean = true, asString: boolean = false): Props<this> | PropsJson<this> | string {
         return toJson<this>.call(this, toSnake, asString);
     }
+
+    fromJson(data: PartialPropsJson<this>): this {
+        EntityBuilder.fill(this, data);
+        return this;
+    }
 }
