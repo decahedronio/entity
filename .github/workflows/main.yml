@@ -1,0 +1,32 @@
+name: Build & Publish
+
+on:
+  workflow_dispatch:
+  release:
+    types: [created]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+      - run: npm install
+      - run: make test
+
+  build_and_publish:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          registry-url: https://registry.npmjs.org/
+      - run: npm install
+      - run: make build
+      - run: make publish
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.npm_token}}
