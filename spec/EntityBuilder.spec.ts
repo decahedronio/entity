@@ -1,5 +1,5 @@
 import { EntityBuilder } from '../src/EntityBuilder';
-import { Entity } from '../src/Entity';
+import { Entity, PartialPropsJson } from '../src/Entity';
 import { Type } from '../src/support/Type';
 import { JsonExclude } from '../src/support/JsonExclude';
 
@@ -138,12 +138,17 @@ describe('EntityBuilder', () => {
     });
 
     it('interprets an annotated primitive as an alias', () => {
+        /*
+         * Type casting at the end is because EntityBuilder would not accept explicit aliased keys,
+         * but a real application will likely pass data directly from an API response, so this
+         * casting is not something consumer codebases will need to do most of the time.
+         */
         const user = EntityBuilder.buildOne(UserWithAliasedPrimitive, {
             name: 'Decahedron Technologies Ltd',
             email: 'hello@decahedron.io',
             days_available: ['Monday', 'Wednesday', 'Friday'],
             second_name: 'A Middle Name',
-        });
+        } as PartialPropsJson<UserWithAliasedPrimitive>);
 
         expect(user.middleName).toEqual('A Middle Name');
     });
