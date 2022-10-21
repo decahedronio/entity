@@ -96,7 +96,7 @@ export class Entity {
      * Convert an Entity to JSON, either in object or string format.
      */
     toJson(toSnake: boolean = true, asString: boolean = false): Props<this> | PropsJson<this> | string {
-        return toJson<this>.call(this, toSnake, asString);
+        return toJson.call(this, toSnake, asString);
     }
 
     fromJson(data: PartialPropsJson<this>): this {
